@@ -1,0 +1,17 @@
+npm install @chakra-ui/react @emotion/react @emotion/styled @mui/icons-material @mui/material @mui/x-charts react-paystack @reduxjs/toolkit @shadcn/ui @toolpad/core antd axios formik framer-motion prop-types react-helmet react-medium-image-zoom react-redux react-router-dom react-slick recharts shadcn-ui slick-carousel yup
+
+
+// Paystack Implementation
+(
+npm install react-paystack
+
+# Paystack
+REACT_APP_PAYSTACK_PUBLIC_KEY=pk_test_your_paystack_key
+PAYSTACK_SECRET_KEY=sk_test_your_paystack_secret
+)
+
+//Paystack Implementation end
+
+# Mongodb password: JXqEyOEXufngjXjT
+# Username: laketek-trove
+# Connection String: mongodb+srv://laketek-trove:JXqEyOEXufngjXjT@cluster0.yvdjljf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
