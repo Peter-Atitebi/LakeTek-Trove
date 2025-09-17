@@ -12,6 +12,11 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { DemoProvider } from "@toolpad/core/internal";
 import useAuthentication from "../../hooks/useAuthentication";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import CustomerWelcomeTemplate from "./partials/CustomerWelcomeTemplate";
+import CustomerTransactions from "./partials/CustomerTransactions";
+import CustomerOrdersTemplate from "./partials/CustomerOrdersTemplate";
+import CustomerCartTemplate from "./partials/CustomerCartTemplate";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 const NAVIGATION = [
   {
@@ -29,28 +34,21 @@ const NAVIGATION = [
     icon: <ShoppingCartIcon />,
   },
   {
+    segment: "transactions",
+    title: "Transactions",
+    icon: <AttachMoneyIcon />,
+  },
+  {
+    segment: "cart",
+    title: "Cart",
+    icon: <ShoppingCartIcon />,
+  },
+  {
     kind: "divider",
   },
   {
     kind: "header",
     title: "Analytics",
-  },
-  {
-    segment: "reports",
-    title: "Reports",
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: "sales",
-        title: "Sales",
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: "traffic",
-        title: "Traffic",
-        icon: <DescriptionIcon />,
-      },
-    ],
   },
   {
     segment: "integrations",
@@ -76,19 +74,26 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
+  const renderTemplate = () => {
+    switch (pathname) {
+      case "/dashboard":
+        // Welcome Screen
+        return <CustomerWelcomeTemplate />;
+      case "/orders":
+        // Orders Management
+        return <CustomerOrdersTemplate />;
+      case "/transactions":
+        // Transactions Overview
+        return <CustomerTransactions />;
+      case "/cart":
+        // Cart Overview
+        return <CustomerCartTemplate />;
+      default:
+        return <CustomerWelcomeTemplate />;
+    }
+  };
+
+  return renderTemplate();
 }
 
 DemoPageContent.propTypes = {

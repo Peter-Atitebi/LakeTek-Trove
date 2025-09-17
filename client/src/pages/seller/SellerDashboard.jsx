@@ -12,6 +12,14 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { DemoProvider } from "@toolpad/core/internal";
 import useAuthentication from "../../hooks/useAuthentication";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import AddIcon from "@mui/icons-material/Add";
+import SellerWelcomeTemplate from "./partials/SellerWelcomeTemplate";
+import SellerTransactions from "./partials/SellerTransactions";
+import SellerCreateNewProduct from "./partials/SellerCreateNewProduct";
+import SellerOrdersTemplate from "./partials/SellerOrdersTemmplate";
+import SellerProductsTemplate from "./partials/SellerProductsTemplate";
 
 const NAVIGATION = [
   {
@@ -27,6 +35,24 @@ const NAVIGATION = [
     segment: "orders",
     title: "Orders",
     icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: "products",
+    title: "Products",
+    icon: <ShoppingBagIcon />,
+  },
+  {
+    segment: "transactions",
+    title: "Transactions",
+    icon: <AttachMoneyIcon />,
+  },
+  {
+    kind: "divider",
+  },
+  {
+    segment: "create-product",
+    title: "Create Product",
+    icon: <AddIcon />,
   },
   {
     kind: "divider",
@@ -76,19 +102,29 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
+  const renderTemplate = () => {
+    switch (pathname) {
+      case "/dashboard":
+        // Welcome Screen
+        return <SellerWelcomeTemplate />;
+      case "/orders":
+        // Orders Management
+        return <SellerOrdersTemplate />;
+      case "/products":
+        // Products Management
+        return <SellerProductsTemplate />;
+      case "/transactions":
+        // Transactions Overview
+        return <SellerTransactions />;
+      case "/create-product":
+        // Create New Product
+        return <SellerCreateNewProduct />;
+      default:
+        return <SellerWelcomeTemplate />;
+    }
+  };
+
+  return renderTemplate();
 }
 
 DemoPageContent.propTypes = {
@@ -107,7 +143,7 @@ function SellerDashboard(props) {
 
   useEffect(() => {
     if (session?.user?.id) {
-      setPathname(`/user/dashboard/${session.user.id}`);
+      setPathname(`/seller/dashboard/${session.user.id}`);
     }
   }, [session]);
 

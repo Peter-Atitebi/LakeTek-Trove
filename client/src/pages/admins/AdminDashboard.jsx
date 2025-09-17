@@ -1,6 +1,4 @@
 import PropTypes from "prop-types";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import { createTheme } from "@mui/material/styles";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -12,6 +10,14 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { DemoProvider } from "@toolpad/core/internal";
 import useAuthentication from "../../hooks/useAuthentication";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import AdminWelcomeScreen from "./partials/AdminWelcomeScreen";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import GroupIcon from "@mui/icons-material/Group";
+import FlagIcon from "@mui/icons-material/Flag";
+import AdminTransactions from "./partials/AdminTransactions";
+import AdminSellers from "./partials/AdminSellers";
+import SuspendedSellers from "./partials/SuspendedSellers";
+import AdminOrders from "./partials/AdminOrders";
 
 const NAVIGATION = [
   {
@@ -27,6 +33,21 @@ const NAVIGATION = [
     segment: "orders",
     title: "Orders",
     icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: "sellers",
+    title: "Sellers",
+    icon: <GroupIcon />,
+  },
+  {
+    segment: "transactions",
+    title: "Transactions",
+    icon: <AttachMoneyIcon />,
+  },
+  {
+    segment: "suspended-sellers",
+    title: "Suspended Sellers",
+    icon: <FlagIcon />,
   },
   {
     kind: "divider",
@@ -76,19 +97,29 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
+  const renderTemplate = () => {
+    switch (pathname) {
+      case "/dashboard":
+        // Welcome Screen
+        return <AdminWelcomeScreen />;
+      case "/orders":
+        // Orders Management
+        return <AdminOrders />
+      case "/sellers":
+        // Sellers Management
+        return <AdminSellers />;
+      case "/transactions":
+        // Transactions Overview
+        return <AdminTransactions />;
+        // Suspended Sellers
+      case "/suspended-sellers":
+        return <SuspendedSellers />;
+      default:
+        return <AdminWelcomeScreen />;
+    }
+  };
+
+  return renderTemplate();
 }
 
 DemoPageContent.propTypes = {
@@ -107,7 +138,7 @@ function AdminDashboard(props) {
 
   useEffect(() => {
     if (session?.user?.id) {
-      setPathname(`/user/dashboard/${session.user.id}`);
+      setPathname(`/admin/dashboard/${session.user.id}`);
     }
   }, [session]);
 
