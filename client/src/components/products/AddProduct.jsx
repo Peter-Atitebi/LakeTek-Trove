@@ -26,6 +26,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from "yup";
+import ErrorList from "antd/es/form/ErrorList";
 // import { Formik, Form, Field } from "formik";
 
 /**
@@ -296,8 +297,19 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
         if (isNaN(price) || price < 0)
           return { ok: false, message: "Enter a valid price" };
-        if (form.priceBefore && (isNaN(priceBefore) || priceBefore < 0))
-          return { ok: false, message: "Enter a valid 'price before' value" };
+
+        if (form.priceBefore) {
+          if (isNaN(priceBefore) || priceBefore < 0)
+            return {
+              ok: false,
+              message: "Enter a valid 'price before' value",
+            };
+          if (priceBefore <= price)
+            return {
+              ok: false,
+              message: "'Price before' should be greater than current price",
+            };
+        }
         if (isNaN(stock) || stock < 0)
           return { ok: false, message: "Enter valid stock quantity" };
         return { ok: true };
@@ -494,40 +506,32 @@ const AddProduct = ({ open, onClose, onSave }) => {
       case 1:
         return (
           <div className="space-y-4">
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Price before (Discount)"
-                  type="number"
-                  inputProps={{ min: 0, step: "0.01" }}
-                  value={form.priceBefore}
-                  onChange={handleChange("priceBefore")}
-                />
-              </Grid>
+            <TextField
+              fullWidth
+              label="Price before (Discount)"
+              type="number"
+              inputProps={{ min: 0, step: "0.01" }}
+              value={form.priceBefore}
+              onChange={handleChange("priceBefore")}
+            />
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Price (NGN)"
-                  type="number"
-                  inputProps={{ min: 0, step: "0.01" }}
-                  value={form.price}
-                  onChange={handleChange("price")}
-                />
-              </Grid>
+            <TextField
+              fullWidth
+              label="Price (NGN)"
+              type="number"
+              inputProps={{ min: 0, step: "0.01" }}
+              value={form.price}
+              onChange={handleChange("price")}
+            />
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Stock Quantity"
-                  type="number"
-                  inputProps={{ min: 0, step: "1" }}
-                  value={form.stock}
-                  onChange={handleChange("stock")}
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              fullWidth
+              label="Stock Quantity"
+              type="number"
+              inputProps={{ min: 0, step: "1" }}
+              value={form.stock}
+              onChange={handleChange("stock")}
+            />
           </div>
         );
 
@@ -620,13 +624,13 @@ const AddProduct = ({ open, onClose, onSave }) => {
                 </div>
               </div>
               {form.imagePreview && (
-                <div className="mt-2">
+                <div className="space-y-1">
                   <Typography variant="subtitle2">Image preview</Typography>
                   <Avatar
                     variant="rounded"
                     src={form.imagePreview}
                     alt="preview"
-                    sx={{ width: 120, height: 120 }}
+                    sx={{ width: "100%", height: "100%" }}
                   />
                 </div>
               )}
