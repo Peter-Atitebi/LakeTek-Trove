@@ -1,4 +1,3 @@
-// src/components/AddProduct.jsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -26,6 +25,8 @@ import PropTypes from "prop-types";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
+import * as Yup from "yup";
+// import { Formik, Form, Field } from "formik";
 
 /**
  * AddProduct
@@ -34,9 +35,46 @@ import CloseIcon from "@mui/icons-material/Close";
  *  - onClose (fn)
  *  - onSave (fn) => receives (formData) // optional
  */
-const AddProduct = ({ open, onClose, onSave }) => {
-  const steps = ["Basic", "Pricing", "Media", "Review"];
 
+// Yup validation schemas for each step
+const validationSchema = Yup.object().shape({
+  // Step 1: Basic
+  name: Yup.string().required("Product name is required"),
+  category: Yup.string().required("Category is required"),
+  subcategory: Yup.string().when("category", {
+    is: (val) => !!val, // if category is selected
+    then: Yup.string().required("Subcategory is required"),
+    otherwise: Yup.string(),
+  }),
+  customSubcategory: Yup.string().when("subcategory", {
+    is: "Custom",
+    then: Yup.string().required("Custom subcategory is required"),
+    otherwise: Yup.string(),
+  }),
+
+  // Step 2: Pricing
+  priceBefore: Yup.number()
+    .typeError("Enter a valid number")
+    .min(0, "Price before must be at least 0")
+    .nullable(),
+  price: Yup.number()
+    .typeError("Enter a valid number")
+    .min(0, "Price must be at least 0")
+    .required("Price is required"),
+  stock: Yup.number()
+    .typeError("Enter a valid number")
+    .integer("Stock must be an integer")
+    .min(0, "Stock must be at least 0")
+    .required("Stock quantity is required"),
+  // Step 3: Media
+  description: Yup.string().required("Description is required"),
+  imageFile: Yup.mixed().required("Product image is required"),
+});
+
+// Stepper steps titles
+const steps = ["Basic", "Pricing", "Media", "Review"];
+
+const AddProduct = ({ open, onClose, onSave }) => {
   // Sample categories & subcategories
   const categories = useMemo(
     () => ({
@@ -53,6 +91,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Bluetooth Speakers",
         "Smart Pens & Styluses",
         "Cables (USB-C, Lightning, HDMI, etc.)",
+        "Custom",
       ],
 
       "Computers & Laptops": [
@@ -64,6 +103,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Networking Devices (Wi-Fi routers, mesh systems, modems, extenders)",
         "Docking Stations & Hubs",
         "Laptop Batteries & Chargers",
+        "Custom",
       ],
 
       "Wearables & Smart Devices": [
@@ -72,6 +112,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "AR/VR Headsets",
         "Smart Glasses",
         "Health Trackers",
+        "Custom",
       ],
 
       "Gaming & Entertainment": [
@@ -81,6 +122,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Streaming Devices (Chromecast, Fire Stick, Apple TV, Roku)",
         "Projectors",
         "Drones",
+        "Custom",
       ],
 
       "Cameras & Photography": [
@@ -92,6 +134,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Lighting Equipment (ring lights, softboxes, LED panels)",
         "Memory Cards & Readers",
         "Camera Bags & Cases",
+        "Custom",
       ],
 
       "Audio & Music Electronics": [
@@ -99,11 +142,13 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Bluetooth & Portable Speakers",
         "Professional Audio (mixers, studio monitors, microphones)",
         "Musical Electronics",
+        "Custom",
       ],
 
       "TVs & Display Tech": [
         "Televisions",
         "TV Accessories (remotes, wall mounts, stands)",
+        "Custom",
       ],
 
       "Home & Office Electronics": [
@@ -111,6 +156,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Projectors",
         "Smart Home Devices (CCTV, smart bulbs, smart plugs, Alexa, Google Home)",
         "Office Electronics (shredders, laminators, conference gadgets)",
+        "Custom",
       ],
 
       "Power & Energy Electronics": [
@@ -119,6 +165,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Stabilizers",
         "Solar Panels & Controllers",
         "Rechargeable Fans & Lamps",
+        "Custom",
       ],
 
       "Automotive Electronics": [
@@ -127,6 +174,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Dash Cameras",
         "GPS Navigation Systems",
         "Car Security Systems",
+        "Custom",
       ],
       Other: ["Custom"],
     }),
@@ -156,16 +204,21 @@ const AddProduct = ({ open, onClose, onSave }) => {
   });
 
   // Update basic field
-  const handleChange = (key) => (e) => {
-    const value = e.target.value;
+  const handleChange = useCallback(
+    (key) => (e) => {
+      const value = e.target.value;
 
-    // Clear customSubcategory if category changes
-    setForm((s) => ({
-      ...s,
-      [key]: value,
-      ...(key === "category" ? { subcategory: "", customSubcategory: "" } : {}),
-    }));
-  };
+      // Clear customSubcategory if category changes
+      setForm((s) => ({
+        ...s,
+        [key]: value,
+        ...(key === "category"
+          ? { subcategory: "", customSubcategory: "" }
+          : {}),
+      }));
+    },
+    []
+  );
 
   // Memoized custom subcategory change handler to prevent re-renders
   const handleCustomSubcategoryChange = useCallback((e) => {
@@ -179,7 +232,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
   useEffect(() => {
     if (form.category) {
       const subs = categories[form.category] || [];
-      if (!subs.includes(form.subcategory)) {
+      if (!subs.includes(form.subcategory) && form.subcategory !== "Custom") {
         setForm((s) => ({ ...s, subcategory: "" }));
       }
     } else {
@@ -196,91 +249,106 @@ const AddProduct = ({ open, onClose, onSave }) => {
     };
   }, [form.imagePreview]);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback((e) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
     // optional: validate file type/size
     const preview = URL.createObjectURL(file);
     // revoke old preview
-    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
-    setForm((s) => ({ ...s, imageFile: file, imagePreview: preview }));
-  };
+    setForm((s) => {
+      if (s.imagePreview) URL.revokeObjectURL(s.imagePreview);
+      return { ...s, imageFile: file, imagePreview: preview };
+    });
+  }, []);
 
-  const removeImage = () => {
-    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
-    setForm((s) => ({ ...s, imageFile: null, imagePreview: null }));
+  const removeImage = useCallback(() => {
+    setForm((s) => {
+      if (s.imagePreview) URL.revokeObjectURL(s.imagePreview);
+      return { ...s, imageFile: null, imagePreview: null };
+    });
     // also clear input value if needed by using ref (not included here)
-  };
+  }, []);
 
   // Step validation (returns true if current step is valid)
-  const validateStep = (stepIndex) => {
-    if (stepIndex === 0) {
-      // Basic: name, category, subcategory (if category has subs)
-      if (!form.name.trim())
-        return { ok: false, message: "Product name is required" };
-      if (!form.category) return { ok: false, message: "Category is required" };
-      const subs = categories[form.category] || [];
-      if (subs.length > 0 && !form.subcategory)
-        return { ok: false, message: "Subcategory is required" };
-      // Validate custom subcategory if selected
-      if (form.subcategory === "custom" && !form.customSubcategory?.trim())
-        return { ok: false, message: "Custom subcategory is required" };
-      return { ok: true };
-    }
-    if (stepIndex === 1) {
-      // Pricing
-      const price = parseFloat(form.price);
-      const priceBefore = form.priceBefore
-        ? parseFloat(form.priceBefore)
-        : null;
-      const stock = parseInt(form.stock ?? "", 10);
+  const validateStep = useCallback(
+    (stepIndex) => {
+      if (stepIndex === 0) {
+        // Basic: name, category, subcategory (if category has subs)
+        if (!form.name.trim())
+          return { ok: false, message: "Product name is required" };
+        if (!form.category)
+          return { ok: false, message: "Category is required" };
+        const subs = categories[form.category] || [];
+        if (subs.length > 0 && !form.subcategory)
+          return { ok: false, message: "Subcategory is required" };
+        // Validate custom subcategory if selected
+        if (form.subcategory === "Custom" && !form.customSubcategory?.trim())
+          return { ok: false, message: "Custom subcategory is required" };
+        return { ok: true };
+      }
+      if (stepIndex === 1) {
+        // Pricing
+        const price = parseFloat(form.price);
+        const priceBefore = form.priceBefore
+          ? parseFloat(form.priceBefore)
+          : null;
+        const stock = parseInt(form.stock ?? "", 10);
 
-      if (isNaN(price) || price < 0)
-        return { ok: false, message: "Enter a valid price" };
-      if (form.priceBefore && (isNaN(priceBefore) || priceBefore < 0))
-        return { ok: false, message: "Enter a valid 'price before' value" };
-      if (isNaN(stock) || stock < 0)
-        return { ok: false, message: "Enter valid stock quantity" };
+        if (isNaN(price) || price < 0)
+          return { ok: false, message: "Enter a valid price" };
+        if (form.priceBefore && (isNaN(priceBefore) || priceBefore < 0))
+          return { ok: false, message: "Enter a valid 'price before' value" };
+        if (isNaN(stock) || stock < 0)
+          return { ok: false, message: "Enter valid stock quantity" };
+        return { ok: true };
+      }
+      if (stepIndex === 2) {
+        // Media: description and image required
+        if (!form.description.trim())
+          return { ok: false, message: "Description is required" };
+        if (!form.imageFile)
+          return { ok: false, message: "Product image is required" };
+        return { ok: true };
+      }
       return { ok: true };
-    }
-    if (stepIndex === 2) {
-      // Media: description required and image optional
-      if (!form.description.trim())
-        return { ok: false, message: "Description is required" };
-      return { ok: true };
-    }
-    return { ok: true };
-  };
+    },
+    [form, categories]
+  );
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const validation = validateStep(activeStep);
     if (!validation.ok) {
       setSnack({ open: true, severity: "error", message: validation.message });
       return;
     }
     setActiveStep((s) => Math.min(s + 1, steps.length - 1));
-  };
+  }, [activeStep, validateStep, steps.length]);
 
-  const handleBack = () => setActiveStep((s) => Math.max(0, s - 1));
+  const handleBack = useCallback(
+    () => setActiveStep((s) => Math.max(0, s - 1)),
+    []
+  );
 
-  const resetForm = () => {
-    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
-    setForm({
-      name: "",
-      category: "",
-      subcategory: "",
-      customSubcategory: "",
-      priceBefore: "",
-      price: "",
-      stock: "",
-      description: "",
-      imageFile: null,
-      imagePreview: null,
+  const resetForm = useCallback(() => {
+    setForm((s) => {
+      if (s.imagePreview) URL.revokeObjectURL(s.imagePreview);
+      return {
+        name: "",
+        category: "",
+        subcategory: "",
+        customSubcategory: "",
+        priceBefore: "",
+        price: "",
+        stock: "",
+        description: "",
+        imageFile: null,
+        imagePreview: null,
+      };
     });
     setActiveStep(0);
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     // final validation
     for (let i = 0; i < 3; i++) {
       const v = validateStep(i);
@@ -299,9 +367,9 @@ const AddProduct = ({ open, onClose, onSave }) => {
       payload.append("name", form.name);
       payload.append("category", form.category);
 
-      // if subcategory is "custom", replace with the custom input
+      // if subcategory is "Custom", replace with the custom input
       const finalSubcategory =
-        form.subcategory === "custom"
+        form.subcategory === "Custom"
           ? form.customSubcategory
           : form.subcategory;
       payload.append("subcategory", finalSubcategory || "");
@@ -335,11 +403,11 @@ const AddProduct = ({ open, onClose, onSave }) => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [form, validateStep, onSave, resetForm, onClose]);
 
-  // Render content for each step
-  const StepContent = ({ step }) => {
-    switch (step) {
+  // Memoized step content to prevent re-renders
+  const stepContent = useMemo(() => {
+    switch (activeStep) {
       case 0:
         return (
           <div className="space-y-4">
@@ -353,64 +421,73 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
             <Grid container spacing={2}>
               {/* Category */}
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="category-label">Category</InputLabel>
-                  <Select
-                    labelId="category-label"
-                    value={form.category}
-                    onChange={handleChange("category")}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
+              <FormControl fullWidth>
+                <InputLabel id="category-label">Category</InputLabel>
+                <Select
+                  labelId="category-label"
+                  label="Category"
+                  value={form.category}
+                  onChange={handleChange("category")}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300,
+                        maxWidth: "none",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {Object.keys(categories).map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
                     </MenuItem>
-                    {Object.keys(categories).map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {cat}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+                  ))}
+                </Select>
+              </FormControl>
 
               {/* Subcategory */}
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="subcategory-label">Subcategory</InputLabel>
-                  <Select
-                    labelId="subcategory-label"
-                    value={form.subcategory}
-                    onChange={handleChange("subcategory")}
-                    disabled={!form.category} // disable if no category chosen
-                  >
-                    {/* Show subcategories for selected category */}
-                    {form.category &&
-                      categories[form.category]?.map((sub) => (
-                        <MenuItem
-                          key={sub}
-                          value={sub === "Custom" ? "custom" : sub}
-                        >
-                          {sub === "Custom" ? <em>Custom</em> : sub}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-
-                {/* Custom subcategory input */}
-                {form.subcategory === "custom" && (
-                  <TextField
-                    key="custom-subcategory-field"
-                    fullWidth
-                    label="Enter Subcategory"
-                    value={form.customSubcategory || ""}
-                    onChange={handleCustomSubcategoryChange}
-                    autoFocus={false}
-                    inputProps={{ autoComplete: "off" }}
-                    sx={{ mt: 2 }}
-                  />
-                )}
-              </Grid>
+              <FormControl fullWidth>
+                <InputLabel id="subcategory-label">Subcategory</InputLabel>
+                <Select
+                  labelId="subcategory-label"
+                  label="Subcategory"
+                  value={form.subcategory}
+                  onChange={handleChange("subcategory")}
+                  disabled={!form.category}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300,
+                        maxWidth: "none",
+                      },
+                    },
+                  }}
+                >
+                  {/* Show subcategories for selected category */}
+                  {form.category &&
+                    categories[form.category]?.map((sub) => (
+                      <MenuItem key={sub} value={sub}>
+                        {sub === "Custom" ? <em>Custom</em> : sub}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </Grid>
+
+            {/* Custom subcategory input - moved outside Grid to prevent re-rendering issues */}
+            {form.subcategory === "Custom" && (
+              <TextField
+                fullWidth
+                label="Enter Custom Subcategory"
+                value={form.customSubcategory}
+                onChange={handleCustomSubcategoryChange}
+                placeholder="Enter your custom subcategory"
+                sx={{ mt: 2 }}
+              />
+            )}
           </div>
         );
 
@@ -523,7 +600,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               </div>
               <div>
                 <strong>Category:</strong> {form.category || "—"} /{" "}
-                {form.subcategory === "custom"
+                {form.subcategory === "Custom"
                   ? form.customSubcategory || "—"
                   : form.subcategory || "—"}
               </div>
@@ -538,7 +615,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               </div>
               <div>
                 <strong>Description:</strong>
-                <div className="mt-1 p-2 bg-gray-50 rounded">
+                <div className="mt-1 p-2 border border-gray-300 rounded whitespace-pre-wrap">
                   {form.description || "—"}
                 </div>
               </div>
@@ -560,7 +637,15 @@ const AddProduct = ({ open, onClose, onSave }) => {
       default:
         return null;
     }
-  };
+  }, [
+    activeStep,
+    form,
+    categories,
+    handleChange,
+    handleCustomSubcategoryChange,
+    handleFileChange,
+    removeImage,
+  ]);
 
   return (
     <>
@@ -582,9 +667,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               ))}
             </Stepper>
 
-            <div className="p-4">
-              <StepContent step={activeStep} />
-            </div>
+            <div className="p-4">{stepContent}</div>
           </Box>
         </DialogContent>
 
@@ -647,20 +730,3 @@ AddProduct.propTypes = {
 };
 
 export default AddProduct;
-
-/**
- * Example wrapper usage:
- *
- * import AddProduct from "./components/AddProduct";
- *
- * function Example() {
- *   const [open, setOpen] = useState(false);
- *   return (
- *     <>
- *       <button className="px-4 py-2 bg-black text-white rounded" onClick={() => setOpen(true)}>Add product</button>
- *       <AddProduct open={open} onClose={() => setOpen(false)} onSave={(payload)=>{/* send to API */
-// }} />
-//  *     </>
-//  *   );
-//  * }
-//  **/

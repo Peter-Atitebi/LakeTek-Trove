@@ -1,13 +1,22 @@
 // src/pages/seller/partials/SellerProductsTemplate.jsx
 
 import AddProduct from "../../../components/products/addProduct";
+import { useState } from "react";
 
 const SellerProductsTemplate = () => {
-  const handleOnClose = () => {};
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
-  const handleOnSave = () => {};
+  const handleOnClose = () => {
+    setIsAddProductOpen(false);
+  };
 
-  const handleOpenAddProduct = () => {};
+  const handleOnSave = () => {
+    setIsAddProductOpen(false);
+  };
+
+  const handleOpenAddProduct = () => {
+    setIsAddProductOpen(true);
+  };
 
   return (
     <>
@@ -31,7 +40,7 @@ const SellerProductsTemplate = () => {
       <AddProduct
         onClose={handleOnClose}
         onSave={handleOnSave}
-        open={handleOpenAddProduct}
+        open={isAddProductOpen}
       />
     </>
   );
