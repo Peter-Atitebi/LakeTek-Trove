@@ -334,62 +334,11 @@ const AddProduct = ({ open, onClose, onSave }) => {
     setActiveStep(0);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    // final validation
-    for (let i = 0; i < 3; i++) {
-      const v = validateStep(i);
-      if (!v.ok) {
-        setActiveStep(i);
-        setSnack({ open: true, severity: "error", message: v.message });
-        return;
-      }
-    }
-
-    setSubmitting(true);
-
-    try {
-      // Build FormData for backend
-      const payload = new FormData();
-      payload.append("name", form.name);
-      payload.append("category", form.category);
-
-      // if subcategory is "Custom", replace with the custom input
-      const finalSubcategory =
-        form.subcategory === "Custom"
-          ? form.customSubcategory
-          : form.subcategory;
-      payload.append("subcategory", finalSubcategory || "");
-
-      payload.append("priceBefore", form.priceBefore || "");
-      payload.append("price", form.price);
-      payload.append("stock", form.stock);
-      payload.append("description", form.description);
-      if (form.imageFile) payload.append("image", form.imageFile);
-
-      console.log("Submitting product (FormData):");
-      for (let pair of payload.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
-      setSnack({
-        open: true,
-        severity: "success",
-        message: "Product created successfully",
-      });
-      if (onSave) onSave(payload);
-      resetForm();
-      onClose?.();
-    } catch (err) {
-      console.error(err);
-      setSnack({
-        open: true,
-        severity: "error",
-        message: "Failed to create product",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [form, validateStep, onSave, resetForm, onClose]);
+  const handleSubmit = (values, actions) => {
+    // onClose(form.data);
+    console.log("values", values);
+    onSave();
+  };
 
   // Memoized step content to prevent re-renders
   const stepContent = useMemo(() => {
