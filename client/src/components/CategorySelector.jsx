@@ -1,7 +1,7 @@
 // src/components/CategorySelector.jsx
 import { useState } from "react";
 import PropTypes from "prop-types";
-import categories from "../utils/CategoriesList";
+import categories from "../hooks/CategoriesList";
 
 const CategorySelector = ({ onCategoryChange, onSubcategoryChange }) => {
   const categoryObject = categories[0]; // because you wrapped everything in an array

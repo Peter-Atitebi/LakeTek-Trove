@@ -1,4 +1,4 @@
-// src/utils/CategoriesList.js
+// src/hooks/CategoriesList.js
 
 const categories = [
   {

@@ -26,7 +26,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from "yup";
-import ErrorList from "antd/es/form/ErrorList";
+import CategorySelector from "../CategorySelector";
 // import { Formik, Form, Field } from "formik";
 
 /**
@@ -431,65 +431,26 @@ const AddProduct = ({ open, onClose, onSave }) => {
               onChange={handleChange("name")}
             />
 
-            <Grid container spacing={2}>
-              {/* Category */}
-              <FormControl fullWidth>
-                <InputLabel id="category-label">Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  label="Category"
-                  value={form.category}
-                  onChange={handleChange("category")}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 300,
-                        maxWidth: "none",
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {Object.keys(categories).map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Subcategory */}
-              <FormControl fullWidth>
-                <InputLabel id="subcategory-label">Subcategory</InputLabel>
-                <Select
-                  labelId="subcategory-label"
-                  label="Subcategory"
-                  value={form.subcategory}
-                  onChange={handleChange("subcategory")}
-                  disabled={!form.category}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 300,
-                        maxWidth: "none",
-                      },
-                    },
-                  }}
-                >
-                  {/* Show subcategories for selected category */}
-                  {form.category &&
-                    categories[form.category]?.map((sub) => (
-                      <MenuItem key={sub} value={sub}>
-                        {sub === "Custom" ? <em>Custom</em> : sub}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Custom subcategory input - moved outside Grid to prevent re-rendering issues */}
+            {/* Category Selector */}
+            <CategorySelector
+              onCategoryChange={(val) =>
+                setForm((s) => ({
+                  ...s,
+                  category: val,
+                  subcategory: "",
+                  customSubcategory: "",
+                }))
+              }
+              onSubcategoryChange={(val) =>
+                setForm((s) => ({
+                  ...s,
+                  subcategory: val,
+                  customSubcategory:
+                    val === "Custom" ? s.customSubcategory : "",
+                }))
+              }
+            />
+            {/* Custom subcategory input */}
             {form.subcategory === "Custom" && (
               <TextField
                 fullWidth
