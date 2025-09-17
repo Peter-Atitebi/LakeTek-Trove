@@ -9,11 +9,6 @@ import {
   Step,
   StepLabel,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Grid,
   IconButton,
   Avatar,
   Box,
@@ -42,11 +37,7 @@ const validationSchema = Yup.object().shape({
   // Step 1: Basic
   name: Yup.string().required("Product name is required"),
   category: Yup.string().required("Category is required"),
-  subcategory: Yup.string().when("category", {
-    is: (val) => !!val, // if category is selected
-    then: Yup.string().required("Subcategory is required"),
-    otherwise: Yup.string(),
-  }),
+  subcategory: Yup.string().required("Subcategory is required"),
   customSubcategory: Yup.string().when("subcategory", {
     is: "Custom",
     then: Yup.string().required("Custom subcategory is required"),
@@ -92,7 +83,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Bluetooth Speakers",
         "Smart Pens & Styluses",
         "Cables (USB-C, Lightning, HDMI, etc.)",
-        "Custom",
       ],
 
       "Computers & Laptops": [
@@ -104,7 +94,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Networking Devices (Wi-Fi routers, mesh systems, modems, extenders)",
         "Docking Stations & Hubs",
         "Laptop Batteries & Chargers",
-        "Custom",
       ],
 
       "Wearables & Smart Devices": [
@@ -113,7 +102,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "AR/VR Headsets",
         "Smart Glasses",
         "Health Trackers",
-        "Custom",
       ],
 
       "Gaming & Entertainment": [
@@ -123,7 +111,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Streaming Devices (Chromecast, Fire Stick, Apple TV, Roku)",
         "Projectors",
         "Drones",
-        "Custom",
       ],
 
       "Cameras & Photography": [
@@ -135,7 +122,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Lighting Equipment (ring lights, softboxes, LED panels)",
         "Memory Cards & Readers",
         "Camera Bags & Cases",
-        "Custom",
       ],
 
       "Audio & Music Electronics": [
@@ -143,13 +129,11 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Bluetooth & Portable Speakers",
         "Professional Audio (mixers, studio monitors, microphones)",
         "Musical Electronics",
-        "Custom",
       ],
 
       "TVs & Display Tech": [
         "Televisions",
         "TV Accessories (remotes, wall mounts, stands)",
-        "Custom",
       ],
 
       "Home & Office Electronics": [
@@ -157,7 +141,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Projectors",
         "Smart Home Devices (CCTV, smart bulbs, smart plugs, Alexa, Google Home)",
         "Office Electronics (shredders, laminators, conference gadgets)",
-        "Custom",
       ],
 
       "Power & Energy Electronics": [
@@ -166,7 +149,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Stabilizers",
         "Solar Panels & Controllers",
         "Rechargeable Fans & Lamps",
-        "Custom",
       ],
 
       "Automotive Electronics": [
@@ -175,9 +157,8 @@ const AddProduct = ({ open, onClose, onSave }) => {
         "Dash Cameras",
         "GPS Navigation Systems",
         "Car Security Systems",
-        "Custom",
       ],
-      Other: ["Custom"],
+      Other: [],
     }),
     []
   );
@@ -229,17 +210,11 @@ const AddProduct = ({ open, onClose, onSave }) => {
     }));
   }, []);
 
-  // When category changes, reset subcategory
+  // When category changes, reset subcategory (simplified since CategorySelector handles all logic)
   useEffect(() => {
-    if (form.category) {
-      const subs = categories[form.category] || [];
-      if (!subs.includes(form.subcategory) && form.subcategory !== "Custom") {
-        setForm((s) => ({ ...s, subcategory: "" }));
-      }
-    } else {
-      setForm((s) => ({ ...s, subcategory: "" }));
+    if (!form.category) {
+      setForm((s) => ({ ...s, subcategory: "", customSubcategory: "" }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.category]);
 
   // Image handling
@@ -274,13 +249,12 @@ const AddProduct = ({ open, onClose, onSave }) => {
   const validateStep = useCallback(
     (stepIndex) => {
       if (stepIndex === 0) {
-        // Basic: name, category, subcategory (if category has subs)
+        // Basic: name, category, subcategory (always required since CategorySelector always provides options)
         if (!form.name.trim())
           return { ok: false, message: "Product name is required" };
         if (!form.category)
           return { ok: false, message: "Category is required" };
-        const subs = categories[form.category] || [];
-        if (subs.length > 0 && !form.subcategory)
+        if (!form.subcategory)
           return { ok: false, message: "Subcategory is required" };
         // Validate custom subcategory if selected
         if (form.subcategory === "Custom" && !form.customSubcategory?.trim())
@@ -324,7 +298,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
       }
       return { ok: true };
     },
-    [form, categories]
+    [form]
   );
 
   const handleNext = useCallback(() => {
@@ -400,7 +374,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
       setSnack({
         open: true,
         severity: "success",
-        message: "Product created (demo)",
+        message: "Product created successfully",
       });
       if (onSave) onSave(payload);
       resetForm();
@@ -433,34 +407,32 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
             {/* Category Selector */}
             <CategorySelector
-              onCategoryChange={(val) =>
+              categories={categories}
+              selectedCategory={form.category}
+              selectedSubcategory={form.subcategory}
+              customSubcategory={form.customSubcategory}
+              onCategoryChange={(value) =>
                 setForm((s) => ({
                   ...s,
-                  category: val,
+                  category: value,
                   subcategory: "",
                   customSubcategory: "",
                 }))
               }
-              onSubcategoryChange={(val) =>
+              onSubcategoryChange={(value) =>
                 setForm((s) => ({
                   ...s,
-                  subcategory: val,
-                  customSubcategory:
-                    val === "Custom" ? s.customSubcategory : "",
+                  subcategory: value,
+                  ...(value !== "Custom" ? { customSubcategory: "" } : {}),
+                }))
+              }
+              onCustomSubcategoryChange={(value) =>
+                setForm((s) => ({
+                  ...s,
+                  customSubcategory: value,
                 }))
               }
             />
-            {/* Custom subcategory input */}
-            {form.subcategory === "Custom" && (
-              <TextField
-                fullWidth
-                label="Enter Custom Subcategory"
-                value={form.customSubcategory}
-                onChange={handleCustomSubcategoryChange}
-                placeholder="Enter your custom subcategory"
-                sx={{ mt: 2 }}
-              />
-            )}
           </div>
         );
 

@@ -15,7 +15,7 @@ const categories = [
       "Bluetooth Speakers",
       "Smart Pens & Styluses",
       "Cables (USB-C, Lightning, HDMI, etc.)",
-      "Custom",
+      ,
     ],
 
     "Computers & Laptops": [
@@ -27,7 +27,7 @@ const categories = [
       "Networking Devices (Wi-Fi routers, mesh systems, modems, extenders)",
       "Docking Stations & Hubs",
       "Laptop Batteries & Chargers",
-      "Custom",
+      ,
     ],
 
     "Wearables & Smart Devices": [
@@ -36,7 +36,7 @@ const categories = [
       "AR/VR Headsets",
       "Smart Glasses",
       "Health Trackers",
-      "Custom",
+      ,
     ],
 
     "Gaming & Entertainment": [
@@ -46,7 +46,7 @@ const categories = [
       "Streaming Devices (Chromecast, Fire Stick, Apple TV, Roku)",
       "Projectors",
       "Drones",
-      "Custom",
+      ,
     ],
 
     "Cameras & Photography": [
@@ -58,7 +58,7 @@ const categories = [
       "Lighting Equipment (ring lights, softboxes, LED panels)",
       "Memory Cards & Readers",
       "Camera Bags & Cases",
-      "Custom",
+      ,
     ],
 
     "Audio & Music Electronics": [
@@ -66,13 +66,13 @@ const categories = [
       "Bluetooth & Portable Speakers",
       "Professional Audio (mixers, studio monitors, microphones)",
       "Musical Electronics",
-      "Custom",
+      ,
     ],
 
     "TVs & Display Tech": [
       "Televisions",
       "TV Accessories (remotes, wall mounts, stands)",
-      "Custom",
+      ,
     ],
 
     "Home & Office Electronics": [
@@ -80,7 +80,7 @@ const categories = [
       "Projectors",
       "Smart Home Devices (CCTV, smart bulbs, smart plugs, Alexa, Google Home)",
       "Office Electronics (shredders, laminators, conference gadgets)",
-      "Custom",
+      ,
     ],
 
     "Power & Energy Electronics": [
@@ -89,7 +89,7 @@ const categories = [
       "Stabilizers",
       "Solar Panels & Controllers",
       "Rechargeable Fans & Lamps",
-      "Custom",
+      ,
     ],
 
     "Automotive Electronics": [
@@ -98,9 +98,9 @@ const categories = [
       "Dash Cameras",
       "GPS Navigation Systems",
       "Car Security Systems",
-      "Custom",
+      ,
     ],
-    Other: ["Custom"],
+    Other: [],
   },
 ];
 
