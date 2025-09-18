@@ -25,14 +25,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from "yup";
 import CategorySelector from "../CategorySelector";
 
-/**
- * AddProduct
- * Props:
- *  - open (bool)
- *  - onClose (fn)
- *  - onSave (fn) => receives (formData) // optional
- */
-
 // Yup validation schemas for each step
 const validationSchema = Yup.object().shape({
   // Step 1: Basic
