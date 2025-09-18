@@ -24,6 +24,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from "yup";
 import CategorySelector from "../CategorySelector";
+import axios from "axios";
+import { SERVER_BASE_URL } from "../../utils/api";
 
 // Yup validation schemas for each step
 const validationSchema = Yup.object().shape({
@@ -328,7 +330,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
   }, []);
 
   const handleSubmit = useCallback(
-    async (values, actions) => {
+    async (values) => {
       // final validation
       for (let i = 0; i < 3; i++) {
         const v = validateStep(i);
@@ -343,44 +345,66 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
       try {
         // Build FormData for backend
-        const payload = new FormData();
-        payload.append("name", form.name);
-        payload.append("category", form.category);
+        const formData = new FormData();
+        formData.append("name", form.name);
+        formData.append("category", form.category);
 
         // if subcategory is "Custom", replace with the custom input
         const finalSubcategory =
           form.subcategory === "Custom"
             ? form.customSubcategory
             : form.subcategory;
-        payload.append("subcategory", finalSubcategory || "");
+        formData.append("subcategory", finalSubcategory || "");
 
-        payload.append("priceBefore", form.priceBefore || "");
-        payload.append("price", form.price);
-        payload.append("stock", form.stock);
-        payload.append("description", form.description);
-        if (form.imageFile) payload.append("image", form.imageFile);
+        formData.append("priceBefore", form.priceBefore || "");
+        formData.append("price", form.price);
+        formData.append("stock", form.stock);
+        formData.append("description", form.description);
+        if (form.imageFile) formData.append("image", form.imageFile);
 
+        // Send FormData to backend
+        const response = await axios.post(
+          `${SERVER_BASE_URL}/products/create`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        // Log FormData entries for debugging
         console.log("Submitting product (FormData):");
-        for (let pair of payload.entries()) {
+        for (let pair of formData.entries()) {
           console.log(pair[0], pair[1]);
         }
 
-        setSnack({
-          open: true,
-          severity: "success",
-          message: "Product created successfully",
-        });
+        // Assuming response contains the created product
+        if (response.status === 201) {
+          console.log("Product created:", response.data);
+          setSnack({
+            open: true,
+            severity: "success",
+            message: "Product created successfully",
+          });
 
-        if (onSave) onSave(payload);
-        onClose?.();
+          if (onSave) onSave(formData);
+          onClose?.();
+          resetForm();
 
-        resetForm();
+          //
+        } else {
+          throw new Error(`Failed to create product: ${response.status}`);
+        }
       } catch (err) {
         console.error(err);
         setSnack({
           open: true,
           severity: "error",
-          message: "Failed to create product",
+          message: `Failed to create product: ${
+            err.response?.data?.message || err.message
+          }`,
         });
       } finally {
         setSubmitting(false);

@@ -25,6 +25,7 @@ const authController = {
   register: async (req, res) => {
     const { name, email, role, password, storeName, description } = req.body;
 
+
     if (!name || !email || !role || !password) {
       return res.status(400).json({
         success: false,

@@ -27,7 +27,7 @@ const productRoutes = require("./routes/productRoute");
 // use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/manager", managerRoutes);
-app.use("/api/product", productRoutes);
+app.use("/api/products", productRoutes);
 
 // Add this after your routes
 app.use((err, req, res, next) => {
