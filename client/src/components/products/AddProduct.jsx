@@ -334,11 +334,67 @@ const AddProduct = ({ open, onClose, onSave }) => {
     setActiveStep(0);
   }, []);
 
-  const handleSubmit = (values, actions) => {
-    // onClose(form.data);
-    console.log("values", values);
-    onSave();
-  };
+  const handleSubmit = useCallback(
+    async (values, actions) => {
+      // final validation
+      for (let i = 0; i < 3; i++) {
+        const v = validateStep(i);
+        if (!v.ok) {
+          setActiveStep(i);
+          setSnack({ open: true, severity: "error", message: v.message });
+          return;
+        }
+      }
+
+      setSubmitting(true);
+
+      try {
+        // Build FormData for backend
+        const payload = new FormData();
+        payload.append("name", form.name);
+        payload.append("category", form.category);
+
+        // if subcategory is "Custom", replace with the custom input
+        const finalSubcategory =
+          form.subcategory === "Custom"
+            ? form.customSubcategory
+            : form.subcategory;
+        payload.append("subcategory", finalSubcategory || "");
+
+        payload.append("priceBefore", form.priceBefore || "");
+        payload.append("price", form.price);
+        payload.append("stock", form.stock);
+        payload.append("description", form.description);
+        if (form.imageFile) payload.append("image", form.imageFile);
+
+        console.log("Submitting product (FormData):");
+        for (let pair of payload.entries()) {
+          console.log(pair[0], pair[1]);
+        }
+
+        setSnack({
+          open: true,
+          severity: "success",
+          message: "Product created successfully",
+        });
+
+        if (onSave) onSave(payload);
+        onClose?.();
+
+        resetForm();
+      } catch (err) {
+        console.error(err);
+        setSnack({
+          open: true,
+          severity: "error",
+          message: "Failed to create product",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [form, validateStep, onSave, resetForm, onClose]
+  );
 
   // Memoized step content to prevent re-renders
   const stepContent = useMemo(() => {
@@ -429,7 +485,34 @@ const AddProduct = ({ open, onClose, onSave }) => {
               onChange={handleChange("description")}
             />
 
-            <div className="flex items-center space-x-4">
+            {form.imagePreview ? (
+              <div>
+                <Avatar
+                  className="mb-2"
+                  variant="rounded"
+                  src={form.imagePreview}
+                  alt="preview"
+                  sx={{ width: "75%", height: "75%" }}
+                />
+                <div>
+                  <Typography variant="body2">
+                    {form.imageFile?.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {(form.imageFile?.size / 1024).toFixed(0)} KB
+                  </Typography>
+                  <IconButton onClick={removeImage} aria-label="remove image">
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
+              </div>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No image selected
+              </Typography>
+            )}
+
+            <div className="flex items-center">
               <input
                 accept="image/*"
                 id="product-image-file"
@@ -446,32 +529,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
                   Upload Image
                 </Button>
               </label>
-
-              {form.imagePreview ? (
-                <div className="flex items-center space-x-2">
-                  <Avatar
-                    variant="rounded"
-                    src={form.imagePreview}
-                    alt="preview"
-                    sx={{ width: 72, height: 72 }}
-                  />
-                  <div>
-                    <Typography variant="body2">
-                      {form.imageFile?.name}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {(form.imageFile?.size / 1024).toFixed(0)} KB
-                    </Typography>
-                  </div>
-                  <IconButton onClick={removeImage} aria-label="remove image">
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No image selected
-                </Typography>
-              )}
             </div>
           </div>
         );
@@ -512,7 +569,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
                     variant="rounded"
                     src={form.imagePreview}
                     alt="preview"
-                    sx={{ width: "100%", height: "100%" }}
+                    sx={{ width: "75%", height: "75%" }}
                   />
                 </div>
               )}
