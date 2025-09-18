@@ -536,6 +536,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               <input
                 accept="image/*"
                 id="product-image-file"
+                name="image"
                 type="file"
                 onChange={handleFileChange}
                 className="hidden"
