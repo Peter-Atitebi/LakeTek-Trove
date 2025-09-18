@@ -364,7 +364,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
         // Send FormData to backend
         const response = await axios.post(
-          `${SERVER_BASE_URL}/products/create`,
+          `${SERVER_BASE_URL}products/create`,
           formData,
           {
             headers: {
