@@ -1,3 +1,5 @@
+// import { Formik, Form, Field } from "formik";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -22,7 +24,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from "yup";
 import CategorySelector from "../CategorySelector";
-// import { Formik, Form, Field } from "formik";
 
 /**
  * AddProduct
