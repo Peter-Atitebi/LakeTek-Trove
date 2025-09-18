@@ -371,7 +371,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
           formData,
           {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${session?.token}`,
             },
           }
@@ -392,9 +392,9 @@ const AddProduct = ({ open, onClose, onSave }) => {
             message: "Product created successfully",
           });
 
-          if (onSave) onSave(formData);
-          onClose?.();
-          resetForm();
+          /*    if (onSave) onSave(formData);  */
+          /* onClose?.(); */
+          /* resetForm(); */
 
           //
         } else {

@@ -12,10 +12,7 @@ app.use(express.json());
 
 // connect to mongodb
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("Mongoose connected"))
   .catch((err) => console.log(err));
 
@@ -31,8 +28,8 @@ app.use("/api/products", productRoutes);
 
 // Add this after your routes
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({ success: false, message: 'Internal server error' });
+  console.error("Unhandled error:", err);
+  res.status(500).json({ success: false, message: "Internal server error" });
 });
 
 // serve static files from the "uploads" directory
