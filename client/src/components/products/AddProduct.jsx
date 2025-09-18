@@ -371,7 +371,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${session?.token}`,
             },
           }

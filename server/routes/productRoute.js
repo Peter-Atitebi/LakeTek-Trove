@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require("../middlewares/authenticate");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
 const {
   createProduct,
   updateProduct,
