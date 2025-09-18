@@ -26,6 +26,7 @@ import * as Yup from "yup";
 import CategorySelector from "../CategorySelector";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../../utils/api";
+import useAuthentication from "../../hooks/useAuthentication";
 
 // Yup validation schemas for each step
 const validationSchema = Yup.object().shape({
@@ -180,6 +181,8 @@ const AddProduct = ({ open, onClose, onSave }) => {
     imagePreview: null,
   });
 
+  const { session } = useAuthentication();
+
   // Update basic field
   const handleChange = useCallback(
     (key) => (e) => {
@@ -279,7 +282,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               message: "'Price before' should be greater than current price",
             };
         }
-        if (isNaN(stock) || stock < 0)
+        if (isNaN(stock) || stock < 1)
           return { ok: false, message: "Enter valid stock quantity" };
         return { ok: true };
       }
@@ -369,7 +372,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${session?.token}`,
             },
           }
         );
@@ -483,7 +486,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
               fullWidth
               label="Stock Quantity"
               type="number"
-              inputProps={{ min: 0, step: "1" }}
+              inputProps={{ min: 1, step: "1" }}
               value={form.stock}
               onChange={handleChange("stock")}
             />

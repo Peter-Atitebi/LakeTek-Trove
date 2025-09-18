@@ -3,6 +3,17 @@ const createProduct = async (req, res) => {
   //    const product = new Product(req.body);
   //    await product.save();
 
+  const {
+    name,
+    description,
+    price,
+    priceBefore,
+    category,
+    subcategory,
+    stock,
+    image,
+  } = req.body;
+
   try {
     console.log(req.body);
     res.status(201).json({
