@@ -12,7 +12,7 @@ const createProduct = async (req, res) => {
     subcategory,
     stock,
     image,
-  } = new Product (req.body);
+  } = new Product(req.body);
 
   try {
     console.log(req.body);

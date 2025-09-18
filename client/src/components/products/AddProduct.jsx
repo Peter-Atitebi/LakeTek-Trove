@@ -226,11 +226,23 @@ const AddProduct = ({ open, onClose, onSave }) => {
   const handleFileChange = useCallback((e) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
-    // optional: validate file type/size
+
+    // validate file size before preview
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File size must be under 2MB");
+      return; // stop here, no preview created
+    }
+
+    // validate file type (optional, e.g. only images)
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files are allowed");
+      return;
+    }
+
+    // if valid, create preview
     const preview = URL.createObjectURL(file);
-    // revoke old preview
     setForm((s) => {
-      if (s.imagePreview) URL.revokeObjectURL(s.imagePreview);
+      if (s.imagePreview) URL.revokeObjectURL(s.imagePreview); // cleanup old preview
       return { ...s, imageFile: file, imagePreview: preview };
     });
   }, []);

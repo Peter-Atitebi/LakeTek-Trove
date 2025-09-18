@@ -14,7 +14,7 @@ if (!fs.existsSync(uploadDir)) {
 // set up multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/"); // specify the upload directory
+    cb(null, uploadDir); // specify the upload directory
   },
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 // upload
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // limit file size to 5MB
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif/;
     const mimeType = allowedTypes.test(file.mimetype);
