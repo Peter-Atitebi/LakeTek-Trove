@@ -11,21 +11,32 @@ const createProduct = async (req, res) => {
     category,
     subcategory,
     stock,
-    image,
   } = new Product(req.body);
 
+  const file = req.file ? `/uploads/${req.file.filename}` : null;
+
   try {
-    console.log(req.body);
-    res.status(201).json({
-      success: true,
-      message: "Product created successfully",
+    const product = new Product({
+      name,
+      description,
+      price,
+      priceBefore,
+      category,
+      subcategory,
+      stock,
+      image: file,
     });
+    await product.save();
+
+    console.log(req.body);
+
+    res.status(201).json(product);
   } catch (error) {
     // handle error
 
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: `Internal server error: ${error.message}`,
     });
   }
 };

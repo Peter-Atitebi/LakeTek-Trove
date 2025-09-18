@@ -404,9 +404,12 @@ const AddProduct = ({ open, onClose, onSave }) => {
             message: "Product created successfully",
           });
 
-          /*    if (onSave) onSave(formData);  */
+          /* if (onSave) onSave(formData); */
           /* onClose?.(); */
           /* resetForm(); */
+
+          // Navigate to the new product page
+          navigation(`/products/product/${response.data._id}`);
 
           //
         } else {

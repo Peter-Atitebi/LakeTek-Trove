@@ -32,19 +32,17 @@ const ProductSchema = new mongoose.Schema({
   },
   subcategory: {
     type: String,
-    required: false,
-  },
-  imageUrl: {
-    type: String,
-    required: false,
+    required: true,
   },
   store: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Store",
+    // required: true,
   },
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    // required: true,
   },
   createdAt: {
     type: Date,
