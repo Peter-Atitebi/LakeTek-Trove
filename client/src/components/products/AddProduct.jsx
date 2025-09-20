@@ -27,6 +27,7 @@ import CategorySelector from "../CategorySelector";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
+import { Link, useNavigate } from "react-router-dom";
 
 // Yup validation schemas for each step
 const validationSchema = Yup.object().shape({
@@ -63,6 +64,7 @@ const validationSchema = Yup.object().shape({
 const steps = ["Basic", "Pricing", "Media", "Review"];
 
 const AddProduct = ({ open, onClose, onSave }) => {
+  const navigate = useNavigate();
   // Sample categories & subcategories
   const categories = useMemo(
     () => ({
@@ -397,6 +399,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
         // Assuming response contains the created product
         if (response.status === 201) {
+          const product = response.data;
           console.log("Product created:", response.data);
           setSnack({
             open: true,
@@ -409,7 +412,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
           /* resetForm(); */
 
           // Navigate to the new product page
-          navigation(`/products/product/${response.data._id}`);
+          navigate(`/store/${product.store}/?productId=${product._id}`);
 
           //
         } else {

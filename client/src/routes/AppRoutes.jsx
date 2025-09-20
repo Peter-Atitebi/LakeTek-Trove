@@ -24,6 +24,10 @@ const AppRoutes = () => {
         {/* Cart */}
         <Route path="/cart" element={<CartTemplate />} />
 
+        {/* Products */}
+        <Route path="/products" element={<p>Products</p>} />
+        <Route path="/store/:storeId" element={<p>Store Details</p>} />
+
         {/* Unauthorized */}
         <Route path="/unauthorized" element={<Unauthorized />} />
 
