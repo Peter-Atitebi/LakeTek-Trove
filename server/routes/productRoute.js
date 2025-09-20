@@ -47,7 +47,7 @@ const {
 router.post("/create", [authenticate, upload.single("image")], createProduct);
 router.put("/update/:id", authenticate, updateProduct);
 router.delete("/delete/:id", authenticate, deleteProduct);
-router.get("/product/:id", getProduct);
+router.get("/:id", getProduct);
 
 // exports
 module.exports = router;

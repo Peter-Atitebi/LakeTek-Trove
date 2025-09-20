@@ -11,6 +11,7 @@ import Checkout from "../pages/Checkout";
 import PrivateRoutes from "./PrivateRoutes";
 import Unauthorized from "../pages/UnAuthorized";
 import CartTemplate from "../pages/CartTemplate";
+import StoreTemplate from "../pages/StoreTemplate";
 
 const AppRoutes = () => {
   return (
@@ -26,7 +27,7 @@ const AppRoutes = () => {
 
         {/* Products */}
         <Route path="/products" element={<p>Products</p>} />
-        <Route path="/store/:storeId" element={<p>Store Details</p>} />
+        <Route path="/store/:storeId" element={<StoreTemplate />} />
 
         {/* Unauthorized */}
         <Route path="/unauthorized" element={<Unauthorized />} />
