@@ -109,8 +109,6 @@ const StoreTemplate = () => {
     return null;
   };
 
-  
-
   const displayStoreDetails = () => {
     if (storeDetails && Object.keys(storeDetails).length > 0) {
       return (
@@ -152,7 +150,14 @@ const StoreTemplate = () => {
     }
 
     if (productId) {
-      return <SingleProduct />
+      return (
+        <SingleProduct
+          product={product}
+          showAddToCart={true}
+          showRelatedProducts={true}
+          showMoreItemsFromSeller={true}
+        />
+      );
     }
 
     return (
