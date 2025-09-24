@@ -226,6 +226,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
   }, [form.imagePreview]);
 
   const handleFileChange = useCallback((e) => {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
 
@@ -236,8 +237,8 @@ const AddProduct = ({ open, onClose, onSave }) => {
     }
 
     // validate file type (optional, e.g. only images)
-    if (!file.type.startsWith("image/")) {
-      alert("Only image files are allowed");
+    if (!allowedTypes.includes(file.type)) {
+      alert("Please upload only JPG, JPEG, PNG, or GIF images");
       return;
     }
 
@@ -484,7 +485,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
           <div className="space-y-4">
             <TextField
               fullWidth
-              label="Price before (Discount)"
+              label="NGN Price before Discount (Optional)"
               type="number"
               inputProps={{ min: 0, step: "0.01" }}
               value={form.priceBefore}

@@ -12,8 +12,7 @@ const getSingleProduct = async (req, res) => {
         .json({ success: false, message: "Product not found" });
     }
     const processedProduct = await processProduct(product);
-    return res.status(200).json(processProduct(processedProduct));
-    console.log("processedProduct:", processedProduct);
+    return res.status(200).json(processedProduct);
   } catch (error) {
     console.log("error:", error);
     res.status(500).json({

@@ -114,7 +114,7 @@ const StoreTemplate = () => {
         <div className="product-details">
           <h2>{product.name}</h2>
           <p>{product.description}</p>
-          <p className="text-gray-600">${product.price?.toFixed(2)}</p>
+          <p className="text-gray-600">₦{product.price?.toFixed(2)}</p>
         </div>
       );
     } else {

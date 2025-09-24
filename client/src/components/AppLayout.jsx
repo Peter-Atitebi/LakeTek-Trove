@@ -9,7 +9,7 @@ const AppLayout = ({ children, classes = "", showHeader = true }) => {
       {/* header */}
 
       {showHeader && <MainHeader />}
-      <main className={`min-h-full mb-36 ${classes}`}>
+      <main className={`mb-10 ${classes}`}>
         <div className="px-4 sm:px-2 lg:px-4 py-6">{children}</div>
       </main>
     </>

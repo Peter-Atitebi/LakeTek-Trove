@@ -10,6 +10,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Universal box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Full height setup */
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+  @apply flex flex-col min-h-screen bg-gray-100;
+}
+
+/* Reset headings */
 h1,
 h2,
 h3,
@@ -19,27 +45,11 @@ h6 {
   margin: 0;
 }
 
-/* Main CSS */
-body,
-html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-  height: 100vh;
+#root {
+  @apply flex-grow;
 }
 
-/* Universal Selector */
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
-/* Responsive typography for smaller screens */
+/* Responsive typography */
 @media (max-width: 600px) {
   body {
     font-size: 14px;
