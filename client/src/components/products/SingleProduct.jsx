@@ -25,10 +25,10 @@ const SingleProduct = ({
           )}
 
           {/* Show more items from seller (store) */}
-          {showMoreItemsFromSeller && <MoreItemsFromSeller />}
+          {showMoreItemsFromSeller && <MoreItemsFromSeller product={product} />}
 
           {/* Show related products */}
-          {showRelatedProducts && <RelatedProducts />}
+          {showRelatedProducts && <RelatedProducts product={product} />}
         </div>
       </>
     );
