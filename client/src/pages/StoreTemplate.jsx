@@ -7,6 +7,18 @@ import AppLayout from "../components/AppLayout";
 import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
 import SingleProduct from "../components/products/SingleProduct";
 
+// Price formatting utility function
+const formatPrice = (price, decimals = 2) => {
+  const numPrice = typeof price === "string" ? parseFloat(price) : price;
+
+  if (isNaN(numPrice)) return "0.00";
+
+  return numPrice.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+};
+
 const StoreTemplate = () => {
   const { storeId } = useParams();
   const [productId, setProductId] = useState("");
@@ -130,7 +142,7 @@ const StoreTemplate = () => {
               <div key={prod._id} className="product-card">
                 <h4>{prod.name}</h4>
                 <p>{prod.description}</p>
-                <p className="text-gray-600">${prod.price?.toFixed(2)}</p>
+                <p className="text-gray-600">₦{formatPrice(prod?.price)}</p>
               </div>
             ))}
           </div>
