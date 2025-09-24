@@ -13,6 +13,7 @@ const getSingleProduct = async (req, res) => {
     }
     const processedProduct = await processProduct(product);
     return res.status(200).json(processProduct(processedProduct));
+    console.log("processedProduct:", processedProduct);
   } catch (error) {
     console.log("error:", error);
     res.status(500).json({
@@ -72,8 +73,6 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {};
 
-const getProduct = async (req, res) => {};
-
 // delete product
 const deleteProduct = async (req, res) => {};
 
@@ -81,5 +80,5 @@ module.exports = {
   createProduct,
   deleteProduct,
   updateProduct,
-  getProduct,
+  getSingleProduct,
 };

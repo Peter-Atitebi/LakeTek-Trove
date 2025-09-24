@@ -40,14 +40,14 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  getProduct,
+  getSingleProduct,
 } = require("../controllers/productController");
 
 // routes
 router.post("/create", [authenticate, upload.single("image")], createProduct);
 router.put("/update/:id", authenticate, updateProduct);
 router.delete("/delete/:id", authenticate, deleteProduct);
-router.get("/:id", getProduct);
+router.get("/product/:id", getSingleProduct);
 
 // exports
 module.exports = router;

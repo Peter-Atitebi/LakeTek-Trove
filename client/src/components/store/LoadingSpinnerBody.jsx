@@ -1,13 +1,11 @@
-//src/components/store/LoadingSpinnerBody.jsx
-
 const LoadingSpinnerBody = () => {
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="flex items-center justify-center w-56 h-56">
+    <div className="flex justify-center items-center h-12 sm:h-16 md:h-20 w-full pt-1 pb-0">
+      <div className="flex items-center justify-center">
         <div role="status">
           <svg
             aria-hidden="true"
-            className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+            className="w-6 h-6 sm:w-8 sm:h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

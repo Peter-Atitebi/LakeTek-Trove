@@ -15,95 +15,99 @@ const StoreTemplate = () => {
   const [storeDetails, setStoreDetails] = useState({});
   const [storeProducts, setStoreProducts] = useState([]);
 
-  // use effect to get product Id
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const prodId = urlParams.get("productId");
     setProductId(prodId);
+
     if (prodId) {
       getProduct(prodId);
     } else {
-      // Get store products
       getStoreDetails(storeId);
     }
-  }, [storeId]); // Added storeId to dependency array
+  }, [storeId, window.location.search]); // Add search params as dependency
 
   const getProduct = async (productId) => {
     setIsLoading(true);
     setErrorMessage("");
+
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/${productId}`
+        `${SERVER_BASE_URL}products/product/${productId}`
       );
+
       if (response.status === 200) {
         if (!response.data) {
           setErrorMessage("Product not found.");
-          setIsLoading(false);
           return;
         }
         setProduct(response.data);
       }
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       setErrorMessage(`Error fetching product: ${error.message}`);
       console.error("Error fetching product:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Get store details
   const getStoreDetails = async (storeId) => {
+    console.log("Getting store details for:", storeId); // Debug log
     setIsLoading(true);
     setErrorMessage("");
+
     try {
       const response = await axios.get(`${SERVER_BASE_URL}stores/${storeId}`);
+      console.log("Store response:", response.data); // Debug log
+
       if (response.status === 200) {
         setStoreDetails(response.data);
         if (response.data) {
-          getStoreProducts(response.data._id);
+          await getStoreProducts(response.data._id);
         }
       }
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
+      console.error("Store details error:", error); // Debug log
       setErrorMessage(`Error fetching store details: ${error.message}`);
-      console.log("Error fetching store details:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Get Store Products
   const getStoreProducts = async (storeId) => {
-    setIsLoading(true);
-    setErrorMessage("");
     try {
       const response = await axios.get(
         `${SERVER_BASE_URL}stores/${storeId}/products`
       );
+
       if (response.status === 200) {
         setStoreProducts(response.data);
       }
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       setErrorMessage(`Error fetching store products: ${error.message}`);
-      console.log("Error fetching store products:", error);
+      console.error("Error fetching store products:", error);
     }
   };
 
-  const checkIfLoading = () => {
-    if (isLoading) {
-      return <LoadingSpinnerBody />;
-    }
-  };
-
-  // Display error message if any
   const displayErrorMessage = () => {
     if (errorMessage) {
-      return <p className="text-red-500">{errorMessage}</p>;
+      return (
+        <div
+          className="error-message border border-red-400 bg-red-100 rounded py-4 px-4 mb-4"
+          role="alert"
+        >
+          {/* Title */}
+          <h2 className="text-red-500 text-xl md:text-2xl lg:text-4xl font-bold">
+            Something Went Wrong
+          </h2>
+          {/* Body */}
+          <p className="text-red-600">{errorMessage}</p>
+        </div>
+      );
     }
+    return null;
   };
 
-  // Display single product
   const displayProduct = () => {
     if (product && Object.keys(product).length > 0) {
       return (
@@ -111,22 +115,33 @@ const StoreTemplate = () => {
           <h2>{product.name}</h2>
           <p>{product.description}</p>
           <p className="text-gray-600">${product.price?.toFixed(2)}</p>
-          {/* Add more product details as needed */}
         </div>
       );
+    } else {
+      return <p>Product not found.</p>;
     }
   };
 
-  // Display store products
+  const displayStoreDetails = () => {
+    if (storeDetails && Object.keys(storeDetails).length > 0) {
+      return (
+        <div className="store-details">
+          <h3>{storeDetails.name}</h3>
+          <p>{storeDetails.description}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const displayStoreProducts = () => {
     if (storeProducts && storeProducts.length > 0) {
       return (
         <div className="store-products">
-          <h2>Products from {storeDetails.name || "Store"}</h2>
           <div className="products-grid">
             {storeProducts.map((prod) => (
               <div key={prod._id} className="product-card">
-                <h3>{prod.name}</h3>
+                <h4>{prod.name}</h4>
                 <p>{prod.description}</p>
                 <p className="text-gray-600">${prod.price?.toFixed(2)}</p>
               </div>
@@ -134,51 +149,41 @@ const StoreTemplate = () => {
           </div>
         </div>
       );
-    } else if (!isLoading && storeProducts.length === 0) {
-      return <p>No products found for this store.</p>;
     }
+    return <p>No products found for this store.</p>;
   };
 
-  // Show loading spinner if loading
-  if (isLoading) {
+  const renderContent = () => {
+    if (isLoading) {
+      return <LoadingSpinnerBody />;
+    }
+
+    if (errorMessage) {
+      return displayErrorMessage();
+    }
+
+    if (productId) {
+      return (
+        <div>
+          <h1>Product Details</h1>
+          {displayProduct()}
+        </div>
+      );
+    }
+
     return (
-      <>
-        <AppLayout>
-          <LoadingSpinnerBody />
-        </AppLayout>
-        <AppFooter />
-      </>
+      <div>
+        <h1>Store</h1>
+        {displayStoreDetails()}
+        <h2>Products</h2>
+        {displayStoreProducts()}
+      </div>
     );
-  }
+  };
 
   return (
     <>
-      <AppLayout>
-        <div className="store-template">
-          <h1>Store Template Page</h1>
-
-          {/* Display error message */}
-          {displayErrorMessage()}
-
-          {/* Display content based on whether we're showing a product or store */}
-          {productId ? (
-            // Single product view
-            <div>
-              <h2>Product Details</h2>
-              {displayProduct()}
-            </div>
-          ) : (
-            // Store products view
-            <div>
-              {storeDetails.name && <h2>Welcome to {storeDetails.name}</h2>}
-              {storeDetails.description && <p>{storeDetails.description}</p>}
-              {displayStoreProducts()}
-            </div>
-          )}
-        </div>
-      </AppLayout>
-
-      {/* Footer */}
+      <AppLayout>{renderContent()}</AppLayout>
       <AppFooter />
     </>
   );
