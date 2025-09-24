@@ -5,6 +5,7 @@ import { SERVER_BASE_URL } from "../utils/api";
 import AppFooter from "../components/footer/AppFooter";
 import AppLayout from "../components/AppLayout";
 import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
+import SingleProduct from "../components/products/SingleProduct";
 
 const StoreTemplate = () => {
   const { storeId } = useParams();
@@ -108,19 +109,7 @@ const StoreTemplate = () => {
     return null;
   };
 
-  const displayProduct = () => {
-    if (product && Object.keys(product).length > 0) {
-      return (
-        <div className="product-details">
-          <h2>{product.name}</h2>
-          <p>{product.description}</p>
-          <p className="text-gray-600">₦{product.price?.toFixed(2)}</p>
-        </div>
-      );
-    } else {
-      return <p>Product not found.</p>;
-    }
-  };
+  
 
   const displayStoreDetails = () => {
     if (storeDetails && Object.keys(storeDetails).length > 0) {
@@ -163,12 +152,7 @@ const StoreTemplate = () => {
     }
 
     if (productId) {
-      return (
-        <div>
-          <h1>Product Details</h1>
-          {displayProduct()}
-        </div>
-      );
+      return <SingleProduct />
     }
 
     return (
