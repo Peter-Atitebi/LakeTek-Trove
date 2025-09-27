@@ -19,6 +19,14 @@ const calculateDiscount = (priceBefore, currentPrice) => {
 };
 
 {/*
+
+// Check if price before exists and is valid
+  const hasPriceBefore =
+    product?.priceBefore &&
+    !isNaN(parseFloat(product.priceBefore)) &&
+    parseFloat(product.priceBefore) > 0;
+
+    
 {/* Price with Discount and Original Price */}
               
                     {/* Discount Badge */}

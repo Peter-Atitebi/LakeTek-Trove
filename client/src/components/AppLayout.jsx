@@ -10,7 +10,7 @@ const AppLayout = ({ children, classes = "", showHeader = true }) => {
 
       {showHeader && <MainHeader />}
       <main className={`mb-10 ${classes}`}>
-        <div className="px-4 sm:px-2 lg:px-4 py-6">{children}</div>
+        <div className="px-4 sm:px-2 md:px-2 lg:px-16 py-6">{children}</div>
       </main>
     </>
   );
