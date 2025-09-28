@@ -70,7 +70,7 @@ const StoreTemplate = () => {
     setErrorMessage("");
 
     try {
-      const response = await axios.get(`${SERVER_BASE_URL}stores/${storeId}`);
+      const response = await axios.get(`${SERVER_BASE_URL}store/${storeId}`);
       console.log("Store response:", response.data); // Debug log
 
       if (response.status === 200) {
@@ -90,7 +90,7 @@ const StoreTemplate = () => {
   const getStoreProducts = async (storeId) => {
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}stores/${storeId}/products`
+        `${SERVER_BASE_URL}store/${storeId}/products`
       );
 
       if (response.status === 200) {

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import MoreItemsFromSeller from "./MoreItemsFromSeller";
 import RelatedProducts from "./RelatedProducts";
 import ProductRating from "../products/ProductRating";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 // Price formatting utility
 const formatPrice = (price, decimals = 2) => {
@@ -32,6 +33,12 @@ const SingleProduct = ({
     parseFloat(product.priceBefore) > 0;
 
   if (product && Object.keys(product).length > 0) {
+    const handleOpenStore = () => {
+      if (store && store._id) {
+        window.open(`/store/${store._id}`, "_blank");
+      }
+    };
+
     return (
       <div className="max-w-6xl mx-auto p-6">
         {/* Layout: Product info + Sidebar */}
@@ -46,14 +53,16 @@ const SingleProduct = ({
                     className="relative cursor-pointer"
                     onClick={handleImageClick}
                   >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full aspect-square sm:h-96 object-cover rounded-lg border border-gray-200"
-                    />
+                    <div className="w-full aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   </div>
                 ) : (
-                  <div className="w-full aspect-square sm:h-96 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                  <div className="w-full aspect-square bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
                     <div className="text-center text-gray-400">
                       <svg
                         className="mx-auto h-16 w-16 mb-2"
@@ -152,44 +161,38 @@ const SingleProduct = ({
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar: Store Info */}
+
           <div className="space-y-6">
             {/* Delivery & Returns */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4  hover:shadow-md hover:border-gray-300 transition-all duration-200">
               <h3 className="text-lg font-medium text-gray-900 mb-3">
                 Delivery & Returns
               </h3>
               <p className="text-sm text-gray-700 mb-2">
                 Shipped from abroad Details
               </p>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Choose your location
-              </label>
-              <select className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                <option>-- Choose a country --</option>
-                <option>Nigeria</option>
-                <option>Ghana</option>
-                <option>Kenya</option>
-              </select>
+              <hr />
             </div>
-
             {/* Seller Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">
-                Seller Information
-              </h3>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4  hover:shadow-md hover:border-gray-300 transition-all duration-200">
+              <div
+                className="flex items-center justify-between mb-4"
+                onClick={handleOpenStore}
+              >
+                <h3 className="text-lg font-medium text-gray-900 mb-3 cursor-pointer">
+                  Seller Information
+                </h3>
+                <ArrowForwardIcon className="text-gray-600  cursor-pointer hover:text-gray-400 shadow-sm transition" />
+              </div>
+
               <p className="text-sm text-gray-700 font-medium">
-                {store?.name || "Unknown Seller"}
+                {store?.storeName || "Unknown Seller"}
               </p>
               <p className="text-sm text-gray-500 mb-2">
                 {store?.description || "No performance data"}
               </p>
-              <div className="text-sm text-gray-500 mb-2">
-                {store?.followers || 0} Followers
-              </div>
-              <button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg">
-                Follow
-              </button>
             </div>
           </div>
         </div>

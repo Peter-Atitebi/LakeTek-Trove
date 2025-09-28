@@ -20,11 +20,13 @@ mongoose
 const authRoutes = require("./routes/auth");
 const managerRoutes = require("./routes/managerRoute");
 const productRoutes = require("./routes/productRoute");
+const storeRoutes = require("./routes/storeRoute");
 
 // use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/store", storeRoutes);
 
 // Add this after your routes
 app.use((err, req, res, next) => {
