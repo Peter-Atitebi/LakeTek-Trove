@@ -44,14 +44,21 @@ const StoreTemplate = () => {
   const [storeProducts, setStoreProducts] = useState([]);
 
   useEffect(() => {
-    if (productId) {
+    // Only fetch product if productId exists and is not null/undefined
+    if (productId && productId !== "undefined" && productId !== "null") {
       getProduct(productId);
-    } else {
+    } else if (storeId) {
       getStoreDetails(storeId);
     }
   }, [storeId, productId]);
 
   const getProduct = async (prodId) => {
+    // Double-check prodId is valid before making request
+    if (!prodId || prodId === "undefined" || prodId === "null") {
+      setErrorMessage("Invalid product ID");
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage("");
 
@@ -76,6 +83,11 @@ const StoreTemplate = () => {
   };
 
   const getStoreDetails = async (storeIdParam) => {
+    if (!storeIdParam) {
+      setErrorMessage("Invalid store ID");
+      return;
+    }
+
     console.log("Getting store details for:", storeIdParam);
     setIsLoading(true);
     setErrorMessage("");
@@ -180,7 +192,7 @@ const StoreTemplate = () => {
     return null;
   };
 
-  const StoreProductsDisplay = ({ storeId: storeIdProp }) => {
+  const StoreProductsDisplay = ({ storeProducts, storeId: storeIdProp }) => {
     const [products, setProducts] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -188,6 +200,14 @@ const StoreTemplate = () => {
 
     // Fetch products when page changes
     useEffect(() => {
+      // If storeProducts prop is provided, use it
+      if (storeProducts?.products && Array.isArray(storeProducts.products)) {
+        setProducts(storeProducts.products);
+        setPagination(storeProducts.pagination);
+        setLoading(false);
+        return;
+      }
+
       const fetchProducts = async () => {
         setLoading(true);
         try {
@@ -212,7 +232,7 @@ const StoreTemplate = () => {
       };
 
       fetchProducts();
-    }, [storeIdProp, currentPage]);
+    }, [storeIdProp, currentPage, storeProducts]);
 
     // Helper function to format price
     const formatPriceLocal = (price) => {
@@ -390,7 +410,7 @@ const StoreTemplate = () => {
                   <div className="flex gap-2">
                     {/* First page */}
                     {currentPage > 3 && (
-                      <>
+                      <React.Fragment key="first-section">
                         <button
                           onClick={() => handlePageClick(1)}
                           className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -400,7 +420,7 @@ const StoreTemplate = () => {
                         {currentPage > 4 && (
                           <span className="px-2 py-2 text-gray-500">...</span>
                         )}
-                      </>
+                      </React.Fragment>
                     )}
 
                     {/* Page numbers around current page */}
@@ -433,7 +453,7 @@ const StoreTemplate = () => {
 
                     {/* Last page */}
                     {currentPage < pagination.totalPages - 2 && (
-                      <>
+                      <React.Fragment key="last-section">
                         {currentPage < pagination.totalPages - 3 && (
                           <span className="px-2 py-2 text-gray-500">...</span>
                         )}
@@ -443,10 +463,9 @@ const StoreTemplate = () => {
                         >
                           {pagination.totalPages}
                         </button>
-                      </>
+                      </React.Fragment>
                     )}
                   </div>
-
                   {/* Next Button */}
                   <button
                     onClick={handleNextPage}
@@ -499,7 +518,7 @@ const StoreTemplate = () => {
       return displayErrorMessage();
     }
 
-    if (productId) {
+    if (productId && productId !== "undefined" && productId !== "null") {
       return (
         <SingleProduct
           product={product}
@@ -517,7 +536,14 @@ const StoreTemplate = () => {
       </div>
     );
   };
-
+  console.log(
+    "storeProducts:",
+    storeProducts,
+    "Type:",
+    typeof storeProducts,
+    "IsArray:",
+    Array.isArray(storeProducts)
+  );
   return (
     <>
       <AppLayout>{renderContent()}</AppLayout>

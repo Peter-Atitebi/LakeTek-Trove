@@ -85,25 +85,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-
-const updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    res.json({ success: true, product });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+const updateProduct = async (req, res) => {};
 
 // delete product
 const deleteProduct = async (req, res) => {};
@@ -159,7 +141,8 @@ const storeProducts = async (req, res) => {
     const products = await Product.find({ store: store._id })
       .populate("store")
       .skip(startIndex)
-      .limit(limit);
+      .limit(limit)
+      .lean(); // Use lean() for better performance
 
     // Get total count for pagination
     const totalProducts = await Product.countDocuments({ store: store._id });
