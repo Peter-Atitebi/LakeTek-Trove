@@ -152,6 +152,10 @@ const storeProducts = async (req, res) => {
       products.map((product) => processProduct(product))
     );
 
+    console.log("Processed Products:", processedProducts); // Debugging log
+
+    // Construct response with pagination info
+
     const response = {
       products: processedProducts,
       pagination: {

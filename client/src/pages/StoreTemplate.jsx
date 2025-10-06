@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../utils/api";
@@ -47,7 +47,8 @@ const StoreTemplate = () => {
     // Only fetch product if productId exists and is not null/undefined
     if (productId && productId !== "undefined" && productId !== "null") {
       getProduct(productId);
-    } else if (storeId) {
+    } else {
+      setProduct(null); // Clear previous product
       getStoreDetails(storeId);
     }
   }, [storeId, productId]);
@@ -119,7 +120,16 @@ const StoreTemplate = () => {
       );
 
       if (response.status === 200) {
-        setStoreProducts(response.data);
+        // Ensure storeProducts is always an object with { products, pagination }
+        const data = response.data;
+        if (Array.isArray(data)) {
+          setStoreProducts({ products: data, pagination: null });
+        } else {
+          setStoreProducts({
+            products: data.products || [],
+            pagination: data.pagination || null,
+          });
+        }
       }
     } catch (error) {
       setErrorMessage(`Error fetching store products: ${error.message}`);
@@ -193,6 +203,7 @@ const StoreTemplate = () => {
   };
 
   const StoreProductsDisplay = ({ storeProducts, storeId: storeIdProp }) => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -289,13 +300,14 @@ const StoreTemplate = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              
               {products.map((prod) => (
                 <div
-                  key={prod._id}
+                  key={prod.id}
                   className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() =>
                     window.open(
-                      `/store/${storeIdProp}?productId=${prod._id}`,
+                      `/store/${storeIdProp}?productId=${prod.id}`,
                       "_blank"
                     )
                   }
@@ -410,7 +422,7 @@ const StoreTemplate = () => {
                   <div className="flex gap-2">
                     {/* First page */}
                     {currentPage > 3 && (
-                      <React.Fragment key="first-section">
+                      <React.Fragment key={`first-section-${currentPage}`}>
                         <button
                           onClick={() => handlePageClick(1)}
                           className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -453,7 +465,7 @@ const StoreTemplate = () => {
 
                     {/* Last page */}
                     {currentPage < pagination.totalPages - 2 && (
-                      <React.Fragment key="last-section">
+                      <React.Fragment key={`last-section-${currentPage}`}>
                         {currentPage < pagination.totalPages - 3 && (
                           <span className="px-2 py-2 text-gray-500">...</span>
                         )}
