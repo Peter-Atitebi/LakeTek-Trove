@@ -75,22 +75,16 @@ const ProductRating = ({ rating = 0 }) => {
   const numRating = typeof rating === "string" ? parseFloat(rating) : rating;
   const validRating =
     isNaN(numRating) || numRating < 0 ? 0 : Math.min(numRating, 5);
-  const displayRating =
-    validRating % 1 === 0 ? validRating.toString() : validRating.toFixed(1);
+  const displayRating = validRating.toFixed(1);
 
   return (
     <div className="mb-4 sm:mb-6">
       <div className="flex items-center gap-3">
         <StarRating rating={validRating} />
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">
-            {displayRating} out of 5
+          <span className="text-xs text-blue-900 bg-blue-50 px-2 py-1 rounded">
+            {displayRating}
           </span>
-          {validRating === 0 && (
-            <span className="text-sm text-gray-500">
-              (No ratings available)
-            </span>
-          )}
         </div>
       </div>
     </div>
@@ -98,7 +92,9 @@ const ProductRating = ({ rating = 0 }) => {
 };
 
 ProductRating.propTypes = {
-  rating: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  ProductRating: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  SellerRating: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default ProductRating;
+export { StarRating };

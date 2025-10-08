@@ -1,7 +1,10 @@
 const Product = require("../models/Product");
 const processProduct = require("../utils/processProduct");
 const Store = require("../models/Store");
-const mongoose = require("mongoose"); // Add this import at the top
+const mongoose = require("mongoose");
+const authCanEditProduct = require("../utils/authCanEditProduct");
+
+// get single product details
 
 const getSingleProduct = async (req, res) => {
   const { id } = req.params;
@@ -22,6 +25,9 @@ const getSingleProduct = async (req, res) => {
         .json({ success: false, message: "Product not found" });
     }
     const processedProduct = await processProduct(product);
+    processedProduct.authCanEditProduct = authCanEditProduct(req, product);
+    console.log("Processed Product:", processedProduct); // Debugging log
+
     return res.status(200).json(processedProduct);
   } catch (error) {
     console.log("error:", error); // Keep for debugging

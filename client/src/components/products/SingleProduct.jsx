@@ -20,6 +20,7 @@ const SingleProduct = ({
   showAddToCart,
   showMoreItemsFromSeller,
   showRelatedProducts,
+  rating = 4,
 }) => {
   // Early return if product is null/undefined
   if (!product || Object.keys(product).length === 0) {
@@ -181,7 +182,7 @@ const SingleProduct = ({
               )}
 
               {/* Rating */}
-              <ProductRating />
+              <ProductRating rating={rating} />
 
               {/* Add to Cart */}
               {showAddToCart && (

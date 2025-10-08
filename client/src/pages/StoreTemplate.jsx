@@ -6,19 +6,7 @@ import AppFooter from "../components/footer/AppFooter";
 import AppLayout from "../components/AppLayout";
 import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
 import SingleProduct from "../components/products/SingleProduct";
-import ProductRating from "../components/products/ProductRating";
-
-// Price formatting utility function
-const formatPrice = (price, decimals = 2) => {
-  const numPrice = typeof price === "string" ? parseFloat(price) : price;
-
-  if (isNaN(numPrice)) return "0.00";
-
-  return numPrice.toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-};
+import { StarRating } from "../components/products/ProductRating";
 
 // Image URL helper function
 const getImageUrl = (imagePath) => {
@@ -34,7 +22,9 @@ const getImageUrl = (imagePath) => {
   return `${baseUrl}${cleanPath}`;
 };
 
-const StoreTemplate = () => {
+const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
+  const formattedProductRating = Number(productRating).toFixed(1);
+  const formattedSellerRating = Number(sellerRating).toFixed(1);
   const { storeId } = useParams();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("productId");
@@ -189,7 +179,9 @@ const StoreTemplate = () => {
               <p className="text-sm text-gray-500">Products</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-semibold text-green-600">4.5★</p>
+              <p className="text-2xl font-semibold text-green-600">
+                {formattedSellerRating}★
+              </p>
               <p className="text-sm text-gray-500">Rating</p>
             </div>
             <div className="text-center">
@@ -379,7 +371,7 @@ const StoreTemplate = () => {
                     </div>
 
                     {/* Rating */}
-                    <ProductRating rating={ProductRating?.rating} />
+                    <StarRating rating={formattedProductRating} />
 
                     {/* Stock Status */}
                     <div className="mt-2">
