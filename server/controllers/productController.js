@@ -140,6 +140,7 @@ const storeProducts = async (req, res) => {
     // Fetch paginated products from database
     const products = await Product.find({ store: store._id })
       .populate("store")
+      .sort({ createdAt: -1 }) // ← Add this line - newest first
       .skip(startIndex)
       .limit(limit)
       .lean(); // Use lean() for better performance

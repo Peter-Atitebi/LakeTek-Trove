@@ -6,6 +6,7 @@ import AppFooter from "../components/footer/AppFooter";
 import AppLayout from "../components/AppLayout";
 import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
 import SingleProduct from "../components/products/SingleProduct";
+import ProductRating from "../components/products/ProductRating";
 
 // Price formatting utility function
 const formatPrice = (price, decimals = 2) => {
@@ -183,7 +184,7 @@ const StoreTemplate = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-100">
             <div className="text-center">
               <p className="text-2xl font-semibold text-blue-600">
-                {storeProducts?.length || 0}
+                {storeProducts?.products?.length}
               </p>
               <p className="text-sm text-gray-500">Products</p>
             </div>
@@ -300,7 +301,6 @@ const StoreTemplate = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-              
               {products.map((prod) => (
                 <div
                   key={prod.id}
@@ -313,7 +313,14 @@ const StoreTemplate = () => {
                   }
                 >
                   {/* Product Image */}
-                  <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-50">
+                  <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-50 relative">
+                    {/* Discount Badge - Add this here */}
+                    {prod.discount > 0 && (
+                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg z-10">
+                        -{prod.discount || 0}%
+                      </span>
+                    )}
+
                     {prod?.image ? (
                       <img
                         src={getImageUrlLocal(prod.image)}
@@ -369,12 +376,10 @@ const StoreTemplate = () => {
                             </p>
                           )}
                       </div>
-                      {prod.discount > 0 && (
-                        <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
-                          -{prod.discount}%
-                        </span>
-                      )}
                     </div>
+
+                    {/* Rating */}
+                    <ProductRating rating={ProductRating?.rating} />
 
                     {/* Stock Status */}
                     <div className="mt-2">

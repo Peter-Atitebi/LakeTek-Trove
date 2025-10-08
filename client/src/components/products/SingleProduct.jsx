@@ -181,7 +181,7 @@ const SingleProduct = ({
               )}
 
               {/* Rating */}
-              <ProductRating rating={product?.rating} />
+              <ProductRating />
 
               {/* Add to Cart */}
               {showAddToCart && (

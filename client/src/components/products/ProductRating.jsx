@@ -1,5 +1,7 @@
 //src/components/products/ProductRating.jsx
 
+import PropTypes from "prop-types";
+
 // Star Rating Component
 const StarRating = ({ rating = 0 }) => {
   const numRating = typeof rating === "string" ? parseFloat(rating) : rating;
@@ -93,6 +95,10 @@ const ProductRating = ({ rating = 0 }) => {
       </div>
     </div>
   );
+};
+
+ProductRating.propTypes = {
+  rating: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default ProductRating;
