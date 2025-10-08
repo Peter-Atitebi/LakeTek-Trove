@@ -3,6 +3,7 @@ module.exports = (req, res, next) => {
   const authorizedEmails = [
     "laketeknologies@gmail.com",
     "lakehub07@gmail.com",
+    "tm123@gmail.com",
   ];
 
   // list of verification codes
