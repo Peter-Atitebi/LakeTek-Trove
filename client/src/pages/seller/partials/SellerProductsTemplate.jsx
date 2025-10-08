@@ -1,6 +1,6 @@
 // src/pages/seller/partials/SellerProductsTemplate.jsx
 
-import AddProduct from "../../components/products/AddProduct.jsx";
+import AddProduct from "../../../components/products/AddProduct";
 import { useState } from "react";
 
 const SellerProductsTemplate = () => {
