@@ -7,6 +7,7 @@ import AppLayout from "../components/AppLayout";
 import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
 import SingleProduct from "../components/products/SingleProduct";
 import { StarRating } from "../components/products/ProductRating";
+import useAuthentication from "../hooks/useAuthentication";
 
 // Image URL helper function
 const getImageUrl = (imagePath) => {
@@ -34,6 +35,8 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
   const [storeDetails, setStoreDetails] = useState(null);
   const [storeProducts, setStoreProducts] = useState([]);
 
+  const { session } = useAuthentication();
+
   useEffect(() => {
     // Only fetch product if productId exists and is not null/undefined
     if (productId && productId !== "undefined" && productId !== "null") {
@@ -56,7 +59,13 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
 
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/product/${prodId}`
+        `${SERVER_BASE_URL}products/product/${prodId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.token}`,
+          },
+        }
       );
 
       if (response.status === 200) {
@@ -160,13 +169,27 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
                 }}
               />
             )}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {storeDetails.name || storeDetails.storeName}
-              </h1>
-              <p className="text-gray-600 text-lg">
-                {storeDetails.description || "Welcome to our store"}
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Logo */}
+              <img
+                src={
+                  storeDetails.logo ||
+                  "https://dummyimage.com/250x250/f5f5f5/999999.png&text=Store+Logo"
+                }
+                alt={storeDetails.name || storeDetails.storeName}
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {storeDetails.name || storeDetails.storeName}
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  {storeDetails.description || "Welcome to our store"}
+                </p>
+              </div>
             </div>
           </div>
 

@@ -25,7 +25,6 @@ const authController = {
   register: async (req, res) => {
     const { name, email, role, password, storeName, description } = req.body;
 
-
     if (!name || !email || !role || !password) {
       return res.status(400).json({
         success: false,
@@ -70,6 +69,10 @@ const authController = {
         });
 
         await store.save();
+
+        // LINK STORE TO USER
+        newUser.store = store._id;
+        await newUser.save();
       }
 
       return res.status(201).json({
@@ -77,7 +80,7 @@ const authController = {
         message: "User created successfully",
       });
     } catch (error) {
-      console.error("Registration error:", error); // Add this for debugging
+      console.error("Registration error:", error);
       return res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -117,9 +120,19 @@ const authController = {
         });
       }
 
-      // create a token
+      // GET USER'S STORE IF THEY'RE A SELLER
+      let userStore = null;
+      if (existingUser.role === "seller") {
+        userStore = await Store.findOne({ seller: existingUser._id });
+      }
+
+      // create a token with store included
       const token = jwt.sign(
-        { id: existingUser._id, role: existingUser.role },
+        {
+          id: existingUser._id,
+          role: existingUser.role,
+          store: userStore?._id, // INCLUDE STORE IN TOKEN
+        },
         process.env.JWT_SECRET,
         {
           expiresIn: "24h",
@@ -132,11 +145,12 @@ const authController = {
           name: existingUser.name,
           email: existingUser.email,
           role: existingUser.role,
+          store: userStore?._id, // INCLUDE STORE IN RESPONSE
         },
         token: token,
       });
     } catch (error) {
-      console.error("Login error:", error); // Added for consistency
+      console.error("Login error:", error);
       return res.status(500).json({
         success: false,
         message: "Internal server error",

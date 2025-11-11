@@ -37,6 +37,7 @@ const processProduct = async (product) => {
       discount: calculateDiscount(product.price, product.priceBefore),
       createdAt: product.createdAt,
       storeId: product.store,
+      
     };
   } catch (error) {
     console.error("Error processing product:", error);

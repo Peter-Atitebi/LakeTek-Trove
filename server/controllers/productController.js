@@ -24,9 +24,9 @@ const getSingleProduct = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Product not found" });
     }
+
     const processedProduct = await processProduct(product);
     processedProduct.authCanEditProduct = authCanEditProduct(req, product);
-    console.log("Processed Product:", processedProduct); // Debugging log
 
     return res.status(200).json(processedProduct);
   } catch (error) {
@@ -47,7 +47,10 @@ const createProduct = async (req, res) => {
     category,
     subcategory,
     stock,
+    user,
   } = req.body;
+
+  console.log("Decoded user:", req.user);
 
   const file = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -58,8 +61,8 @@ const createProduct = async (req, res) => {
 
   try {
     // Assuming req.user is populated by authentication middleware
-    const sellerId = req.user._id; // Access _id if req.user is the full user document or use req.user.id
-    const sellerStore = await Store.findOne({ seller: sellerId });
+    const seller = req.user._id || req.user.id || req.user.userId; // Access _id if req.user is the full user document or use req.user.id
+    const sellerStore = await Store.findOne({ seller });
 
     if (!sellerStore) {
       return res.status(400).json({
@@ -78,6 +81,7 @@ const createProduct = async (req, res) => {
       stock,
       image: file,
       store: sellerStore._id,
+      seller,
     });
 
     await product.save();

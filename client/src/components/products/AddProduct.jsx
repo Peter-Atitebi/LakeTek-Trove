@@ -27,7 +27,7 @@ import CategorySelector from "../CategorySelector";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 // Yup validation schemas for each step
 const validationSchema = Yup.object().shape({
@@ -65,6 +65,52 @@ const steps = ["Basic", "Pricing", "Media", "Review"];
 
 const AddProduct = ({ open, onClose, onSave }) => {
   const navigate = useNavigate();
+  const { storeId } = useParams();
+  const { session } = useAuthentication();
+
+  const actualStoreId = storeId || session?.user?.store;
+
+  console.log("store id from url:", actualStoreId);
+  console.log("session object:", session);
+
+  // Check if user is authenticated
+  if (!session || !session.token) {
+    return (
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>Authentication Required</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px" gap={2}>
+            <Typography variant="h6" color="error">Not Authenticated</Typography>
+            <Typography>Please log in to add products.</Typography>
+            <Button variant="contained" onClick={() => navigate("/login")}>Go to Login</Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Check if store exists
+  if (!actualStoreId) {
+    return (
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>Store Required</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px" gap={2}>
+            <Typography variant="h6" color="error">No Store Found</Typography>
+            <Typography>You need to create a store first before adding products.</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Store ID: {actualStoreId || 'undefined'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              User role: {session?.user?.role}
+            </Typography>
+            <Button variant="contained" onClick={onClose}>Close</Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   // Sample categories & subcategories
   const categories = useMemo(
     () => ({
@@ -182,8 +228,6 @@ const AddProduct = ({ open, onClose, onSave }) => {
     imageFile: null,
     imagePreview: null,
   });
-
-  const { session } = useAuthentication();
 
   // Update basic field
   const handleChange = useCallback(
@@ -349,6 +393,16 @@ const AddProduct = ({ open, onClose, onSave }) => {
 
   const handleSubmit = useCallback(
     async (values) => {
+      // Validate store exists
+      if (!actualStoreId) {
+        setSnack({
+          open: true,
+          severity: "error",
+          message: "Store ID is missing. Please create a store first.",
+        });
+        return;
+      }
+
       // final validation
       for (let i = 0; i < 3; i++) {
         const v = validateStep(i);
@@ -360,12 +414,12 @@ const AddProduct = ({ open, onClose, onSave }) => {
       }
 
       setSubmitting(true);
-
       try {
         // Build FormData for backend
         const formData = new FormData();
         formData.append("name", form.name);
         formData.append("category", form.category);
+        formData.append("store", actualStoreId);
 
         // if subcategory is "Custom", replace with the custom input
         const finalSubcategory =
@@ -380,6 +434,15 @@ const AddProduct = ({ open, onClose, onSave }) => {
         formData.append("description", form.description);
         if (form.imageFile) formData.append("image", form.imageFile);
 
+        // Log FormData entries for debugging
+        console.log("=== SUBMITTING PRODUCT ===");
+        console.log("Store ID being sent:", actualStoreId);
+        console.log("Session data:", session);
+        console.log("FormData entries:");
+        for (let pair of formData.entries()) {
+          console.log(`  ${pair[0]}:`, pair[1]);
+        }
+
         // Send FormData to backend
         const response = await axios.post(
           `${SERVER_BASE_URL}products/create`,
@@ -392,47 +455,40 @@ const AddProduct = ({ open, onClose, onSave }) => {
           }
         );
 
-        // Log FormData entries for debugging
-        console.log("Submitting product (FormData):");
-        for (let pair of formData.entries()) {
-          console.log(pair[0], pair[1]);
-        }
-
         // Assuming response contains the created product
         if (response.status === 201) {
           const product = response.data;
-          console.log("Product created:", response.data);
+          console.log("Product created successfully:", response.data);
           setSnack({
             open: true,
             severity: "success",
             message: "Product created successfully",
           });
 
-          /* if (onSave) onSave(formData); */
-          /* onClose?.(); */
-          /* resetForm(); */
-
           // Navigate to the new product page
           navigate(`/store/${product.store}/?productId=${product._id}`);
-
-          //
         } else {
           throw new Error(`Failed to create product: ${response.status}`);
         }
       } catch (err) {
-        console.error(err);
+        console.error("=== ERROR CREATING PRODUCT ===");
+        console.error("Full error object:", err);
+        console.error("Error response data:", err.response?.data);
+        console.error("Error response status:", err.response?.status);
+        console.error("Error message:", err.message);
+        
+        const errorMessage = err.response?.data?.message || err.message || "Unknown error occurred";
+        
         setSnack({
           open: true,
           severity: "error",
-          message: `Failed to create product: ${
-            err.response?.data?.message || err.message
-          }`,
+          message: `Failed to create product: ${errorMessage}`,
         });
       } finally {
         setSubmitting(false);
       }
     },
-    [form, validateStep, onSave, resetForm, onClose]
+    [form, validateStep, onSave, resetForm, onClose, actualStoreId, session, navigate]
   );
 
   // Memoized step content to prevent re-renders
@@ -588,6 +644,9 @@ const AddProduct = ({ open, onClose, onSave }) => {
                   : form.subcategory || "—"}
               </div>
               <div>
+                <strong>Store ID:</strong> {actualStoreId || "—"}
+              </div>
+              <div>
                 <strong>Price before:</strong> {form.priceBefore || "—"}
               </div>
               <div>
@@ -628,6 +687,7 @@ const AddProduct = ({ open, onClose, onSave }) => {
     handleCustomSubcategoryChange,
     handleFileChange,
     removeImage,
+    actualStoreId,
   ]);
 
   return (

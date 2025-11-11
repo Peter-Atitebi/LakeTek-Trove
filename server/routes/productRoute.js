@@ -53,9 +53,5 @@ router.get("/product/:id", getSingleProduct);
 router.get("/store/:id", storeDetails);
 router.get("/store/:id/products", storeProducts);
 
-
 // exports
 module.exports = router;
-
-
-
