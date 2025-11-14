@@ -4,6 +4,8 @@ import MoreItemsFromSeller from "./MoreItemsFromSeller";
 import RelatedProducts from "./RelatedProducts";
 import ProductRating from "../products/ProductRating";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Button from "@mui/material/Button";
 
 // Price formatting utility
 const formatPrice = (price, decimals = 2) => {
@@ -130,9 +132,16 @@ const SingleProduct = ({
 
             {/* Product Details */}
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                {product?.name}
-              </h1>
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                  {product?.name}
+                </h1>
+                <Button variant="text">
+                  {" "}
+                  <MoreVertIcon className="text-gray-600 mb-4" />
+                  <span className="sr-only">More Options</span>
+                </Button>
+              </div>
 
               {/* Price & Discount */}
               <div className="mb-4 sm:mb-6">
