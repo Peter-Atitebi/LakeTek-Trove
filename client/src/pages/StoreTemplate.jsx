@@ -552,11 +552,25 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
 
     if (productId && productId !== "undefined" && productId !== "null") {
       return (
+        // In your parent component
         <SingleProduct
           product={product}
           showAddToCart={true}
-          showRelatedProducts={true}
           showMoreItemsFromSeller={true}
+          showRelatedProducts={true}
+
+          // onEdit={(productId) => {
+          //   // Navigate to edit page or open edit modal
+          //   navigate(`/products/edit/${productId}`);
+          // }}
+          // onDelete={(productId) => {
+          //   // Call your delete API
+          //   deleteProduct(productId);
+          // }}
+          // onDuplicate={(product) => {
+          //   // Call your duplicate API
+          //   duplicateProduct(product);
+          // }}
         />
       );
     }

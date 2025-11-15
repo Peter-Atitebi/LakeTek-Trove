@@ -17,10 +17,11 @@ import ShareIcon from "@mui/icons-material/Share";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { blue, green, orange, red, grey } from "@mui/material/colors";
 
-const productOptions = [
+const productActions = [
   { id: "view", label: "View Details", icon: VisibilityIcon, color: blue },
-  { id: "edit", label: "Edit Product", icon: EditIcon, color: green },
   { id: "duplicate", label: "Duplicate", icon: ContentCopyIcon, color: orange },
+
+  { id: "edit", label: "Edit Product", icon: EditIcon, color: green },
   { id: "share", label: "Share", icon: ShareIcon, color: grey },
   { id: "delete", label: "Delete", icon: DeleteIcon, color: red },
 ];
@@ -32,32 +33,32 @@ function ProductOptions(props) {
     onClose(null);
   };
 
-  const handleListItemClick = (value) => {
+  const handleActionClick = (value) => {
     onClose(value);
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>
-        {productName ? `Options for "${productName}"` : "Product Options"}
+        {productName ? `Options for "${productName}"` : "Product Actions"}
       </DialogTitle>
       <List sx={{ pt: 0, minWidth: 300 }}>
-        {productOptions.map((option) => {
-          const IconComponent = option.icon;
+        {productActions.map((action) => {
+          const IconComponent = action.icon;
           return (
-            <ListItem disablePadding key={option.id}>
-              <ListItemButton onClick={() => handleListItemClick(option.id)}>
+            <ListItem disablePadding key={action.id}>
+              <ListItemButton onClick={() => handleActionClick(action.id)}>
                 <ListItemAvatar>
                   <Avatar
                     sx={{
-                      bgcolor: option.color[100],
-                      color: option.color[600],
+                      bgcolor: action.color[100],
+                      color: action.color[600],
                     }}
                   >
                     <IconComponent />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={option.label} />
+                <ListItemText primary={action.label} />
               </ListItemButton>
             </ListItem>
           );
@@ -71,69 +72,8 @@ ProductOptions.propTypes = {
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   selectedValue: PropTypes.string,
+  product: PropTypes.object.isRequired,
   productName: PropTypes.string,
 };
 
-export default function ProductOptionsDemo() {
-  const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState("");
-  const [productName] = React.useState("Wireless Headphones");
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (value) => {
-    setOpen(false);
-    if (value) {
-      setSelectedValue(value);
-      // Handle the selected action
-      switch (value) {
-        case "view":
-          console.log("Viewing product details...");
-          break;
-        case "edit":
-          console.log("Editing product...");
-          break;
-        case "duplicate":
-          console.log("Duplicating product...");
-          break;
-        case "share":
-          console.log("Sharing product...");
-          break;
-        case "delete":
-          console.log("Deleting product...");
-          break;
-        default:
-          break;
-      }
-    }
-  };
-
-  return (
-    <div style={{ padding: "20px" }}>
-      <Typography variant="h6" component="div" gutterBottom>
-        Product: {productName}
-      </Typography>
-      {selectedValue && (
-        <Typography
-          variant="body2"
-          component="div"
-          color="text.secondary"
-          sx={{ mb: 2 }}
-        >
-          Last action: {selectedValue}
-        </Typography>
-      )}
-      <Button variant="contained" onClick={handleClickOpen}>
-        Product Options
-      </Button>
-      <ProductOptions
-        selectedValue={selectedValue}
-        open={open}
-        onClose={handleClose}
-        productName={productName}
-      />
-    </div>
-  );
-}
+export default ProductOptions;

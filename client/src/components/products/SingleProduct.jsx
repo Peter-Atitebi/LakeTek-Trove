@@ -6,6 +6,7 @@ import ProductRating from "../products/ProductRating";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Button from "@mui/material/Button";
+import ProductOptions from "./ProductOptions";
 
 // Price formatting utility
 const formatPrice = (price, decimals = 2) => {
@@ -23,6 +24,9 @@ const SingleProduct = ({
   showMoreItemsFromSeller,
   showRelatedProducts,
   rating = 4,
+  onEdit,
+  onDelete,
+  onDuplicate,
 }) => {
   // Early return if product is null/undefined
   if (!product || Object.keys(product).length === 0) {
@@ -57,6 +61,7 @@ const SingleProduct = ({
 
   const store = product.store;
   const [isImageZoomed, setIsImageZoomed] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleImageClick = () => setIsImageZoomed(true);
   const closeZoomedImage = () => setIsImageZoomed(false);
@@ -69,6 +74,69 @@ const SingleProduct = ({
   const handleOpenStore = () => {
     if (store && store._id) {
       window.open(`/store/${product.storeId}`, "_blank");
+    }
+  };
+
+  const handleProductOptions = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleCloseOptions = (action) => {
+    setIsOpen(false);
+
+    if (action) {
+      switch (action) {
+        case "view":
+          // Already viewing, maybe scroll to description or show more details
+          console.log("Viewing product:", product.name);
+          break;
+        case "edit":
+          // Navigate to edit page or call onEdit callback
+          if (onEdit) {
+            onEdit(product._id || product.id);
+          } else {
+            window.location.href = `/products/edit/${product._id || product.id}`;
+          }
+          break;
+        case "duplicate":
+          // Handle duplication
+          if (onDuplicate) {
+            onDuplicate(product);
+          } else {
+            console.log("Duplicating product:", product._id);
+          }
+          break;
+        case "share":
+          // Share product link
+          const shareUrl = window.location.href;
+          if (navigator.clipboard) {
+            navigator.clipboard
+              .writeText(shareUrl)
+              .then(() => {
+                alert("Product link copied to clipboard!");
+              })
+              .catch(() => {
+                alert("Unable to copy link");
+              });
+          } else {
+            alert(`Share this link: ${shareUrl}`);
+          }
+          break;
+        case "delete":
+          // Show confirmation dialog before deleting
+          if (
+            window.confirm(`Are you sure you want to delete "${product.name}"?`)
+          ) {
+            if (onDelete) {
+              onDelete(product._id || product.id);
+            } else {
+              console.log("Deleting product:", product._id);
+            }
+          }
+          break;
+        default:
+          break;
+      }
     }
   };
 
@@ -132,13 +200,17 @@ const SingleProduct = ({
 
             {/* Product Details */}
             <div className="flex-1">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-start mb-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
                   {product?.name}
                 </h1>
-                <Button variant="text">
-                  {" "}
-                  <MoreVertIcon className="text-gray-600 mb-4" />
+                <Button
+                  variant="text"
+                  aria-label="More Options"
+                  onClick={handleProductOptions}
+                  sx={{ minWidth: "auto", padding: "8px" }}
+                >
+                  <MoreVertIcon className="text-gray-600" />
                   <span className="sr-only">More Options</span>
                 </Button>
               </div>
@@ -216,10 +288,9 @@ const SingleProduct = ({
         </div>
 
         {/* Sidebar: Store Info */}
-
         <div className="space-y-6">
           {/* Delivery & Returns */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4  hover:shadow-md hover:border-gray-300 transition-all duration-200">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all duration-200">
             <h3 className="text-lg font-medium text-gray-900 mb-3">
               Delivery & Returns
             </h3>
@@ -229,8 +300,7 @@ const SingleProduct = ({
             <hr />
           </div>
           {/* Seller Info */}
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4  hover:shadow-md hover:border-gray-300 transition-all duration-200">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all duration-200">
             <div
               className="flex items-center justify-between mb-4"
               onClick={handleOpenStore}
@@ -238,7 +308,7 @@ const SingleProduct = ({
               <h3 className="text-lg font-medium text-gray-900 mb-3 cursor-pointer">
                 Seller Information
               </h3>
-              <ArrowForwardIcon className="text-gray-600  cursor-pointer hover:text-gray-400 shadow-sm transition" />
+              <ArrowForwardIcon className="text-gray-600 cursor-pointer hover:text-gray-400 shadow-sm transition" />
             </div>
 
             <p className="text-sm text-gray-700 font-medium">
@@ -273,7 +343,7 @@ const SingleProduct = ({
         >
           <button
             onClick={closeZoomedImage}
-            className="absolute top-4 right-4 text-white hover:text-gray-300"
+            className="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl"
           >
             ✕
           </button>
@@ -285,12 +355,21 @@ const SingleProduct = ({
           />
         </div>
       )}
+
+      {/* Product Options Dialog */}
+      <ProductOptions
+        open={isOpen}
+        onClose={handleCloseOptions}
+        productName={product.name}
+      />
     </div>
   );
 };
 
 SingleProduct.propTypes = {
   product: PropTypes.shape({
+    _id: PropTypes.string,
+    id: PropTypes.string,
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -299,10 +378,16 @@ SingleProduct.propTypes = {
     stock: PropTypes.number.isRequired,
     image: PropTypes.string.isRequired,
     store: PropTypes.object,
+    storeId: PropTypes.string,
+    shippingInfo: PropTypes.string,
   }).isRequired,
   showAddToCart: PropTypes.bool,
   showMoreItemsFromSeller: PropTypes.bool,
   showRelatedProducts: PropTypes.bool,
+  rating: PropTypes.number,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onDuplicate: PropTypes.func,
 };
 
 export default SingleProduct;

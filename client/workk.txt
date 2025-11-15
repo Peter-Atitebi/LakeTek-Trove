@@ -94,7 +94,21 @@ const StoreTemplate = ({rating = 3}) => {
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Paystack inline method
 
+const payWithPaystack = () => {
+  const handler = window.PaystackPop.setup({
+    key: "your-public-key",
+    email: "customer@email.com",
+    amount: 500000,
+    currency: "NGN",
+    callback: (response) => {
+      console.log("Success:", response);
+    }
+  });
+
+  handler.openIframe();
+};
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
