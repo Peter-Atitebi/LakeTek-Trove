@@ -20,6 +20,7 @@ import SellerTransactions from "./partials/SellerTransactions";
 import SellerCreateNewProduct from "./partials/SellerCreateNewProduct";
 import SellerOrdersTemplate from "./partials/SellerOrdersTemmplate";
 import SellerProductsTemplate from "./partials/SellerProductsTemplate";
+import AddProduct from "../../components/products/AddProduct";
 
 const NAVIGATION = [
   {
@@ -137,6 +138,7 @@ function SellerDashboard(props) {
 
   const demoWindow = window !== undefined ? window() : undefined;
   const [pathname, setPathname] = useState("");
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   // Move useCallback to top level - this was the original issue
   const navigate = useCallback((path) => setPathname(String(path)), []);
@@ -157,6 +159,18 @@ function SellerDashboard(props) {
     [pathname, navigate]
   );
 
+  const handleOpenAddProduct = () => {
+    setIsAddProductOpen(true);
+  };
+
+  const handleOnClose = () => {
+    setIsAddProductOpen(false);
+  };
+
+  const handleOnSave = () => {
+    setIsAddProductOpen(false);
+  };
+
   return (
     <DemoProvider window={demoWindow}>
       <AppProvider
@@ -172,8 +186,24 @@ function SellerDashboard(props) {
         window={demoWindow}
       >
         <DashboardLayout>
+          <div className="flex justify-end items-center px-4 py-2">
+            <div>
+              <button
+                onClick={handleOpenAddProduct}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Add Product
+              </button>
+            </div>
+          </div>
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
+        {/* Add product */}
+        <AddProduct
+          onClose={handleOnClose}
+          onSave={handleOnSave}
+          open={isAddProductOpen}
+        />
       </AppProvider>
     </DemoProvider>
   );
