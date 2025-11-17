@@ -4,7 +4,7 @@ import axios from "axios";
 import { SERVER_BASE_URL } from "../utils/api";
 import AppFooter from "../components/footer/AppFooter";
 import AppLayout from "../components/AppLayout";
-import LoadingSpinnerBody from "../components/store/LoadingSpinnerBody";
+import LoadingSpinnerBody from "../components/LoadingSpinnerBody";
 import SingleProduct from "../components/products/SingleProduct";
 import { StarRating } from "../components/products/ProductRating";
 import useAuthentication from "../hooks/useAuthentication";
