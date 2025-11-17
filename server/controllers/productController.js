@@ -187,6 +187,35 @@ const storeProducts = async (req, res) => {
   }
 };
 
+const storeProductsBySeller = async (req, res) => {
+  const seller = req.user.id;
+
+  if (!seller) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Unauthorized User" });
+  }
+  try {
+    const store = await Store.findOne({ seller });
+    if (!store) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Store not found" });
+    }
+    const products = await Product.find({ store: store._id })
+      .populate("store")
+      .sort({ createdAt: -1 }); // newest first
+    const processedProducts = await Promise.all(
+      products.map(async (product) => await processProduct(product))
+    );
+    return res.status(200).json(processedProducts);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error: " + error });
+  }
+};
+
 module.exports = {
   createProduct,
   deleteProduct,
@@ -194,4 +223,5 @@ module.exports = {
   getSingleProduct,
   storeDetails,
   storeProducts,
+  storeProductsBySeller,
 };

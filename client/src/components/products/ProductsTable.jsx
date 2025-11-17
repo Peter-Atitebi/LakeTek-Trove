@@ -1,8 +1,10 @@
 import { DataGrid } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 
 function ProductsTable({ products, onEdit, onDelete }) {
   const columns = [
@@ -12,10 +14,10 @@ function ProductsTable({ products, onEdit, onDelete }) {
       width: 100,
       sortable: false,
       renderCell: (params) => (
-        <img
+        <Avatar
           src={params.value}
-          alt="product"
-          className="w-12 h-12 object-cover rounded-md border"
+          alt={params.row.name}
+          sx={{ width: 50, height: 50 }}
         />
       ),
     },
@@ -23,7 +25,6 @@ function ProductsTable({ products, onEdit, onDelete }) {
       field: "name",
       headerName: "Name",
       width: 200,
-      flex: 1,
     },
     {
       field: "price",
@@ -44,33 +45,44 @@ function ProductsTable({ products, onEdit, onDelete }) {
       width: 180,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => onEdit(params.row)}
+        <Box>
+          <IconButton
+            color="primary"
+            aria-label="edit"
+            onClick={() => onEdit?.(params.row.id)}
           >
-            Edit
-          </Button>
-          <Button
-            size="small"
+            <EditIcon />
+          </IconButton>
+          <IconButton
             color="error"
-            variant="contained"
-            onClick={() => onDelete(params.row.id)}
+            aria-label="delete"
+            onClick={() => onDelete?.(params.row.id)}
           >
-            Delete
-          </Button>
-        </Stack>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
       ),
     },
   ];
 
-  return products && products.length > 0 ? (
+  // Store price as NUMBER, not formatted string
+  const rows =
+    products &&
+    products.length > 0 &&
+    products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      price: `${product.price}`,
+      category: product.category,
+      image: product.image,
+    }));
+
+  return rows && rows.length > 0 ? (
     <Box sx={{ height: 500, width: "100%" }}>
       <DataGrid
-        rows={products}
+        rows={rows}
         columns={columns}
-        getRowId={(row) => row.id} // Ensures unique row IDs
+        getRowId={(row) => row.id}
         initialState={{
           pagination: { paginationModel: { pageSize: 10 } },
         }}

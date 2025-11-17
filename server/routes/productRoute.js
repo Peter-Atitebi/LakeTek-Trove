@@ -43,6 +43,7 @@ const {
   getSingleProduct,
   storeDetails,
   storeProducts,
+  storeProductsBySeller,
 } = require("../controllers/productController");
 
 // routes
@@ -52,6 +53,7 @@ router.delete("/delete/:id", authenticate, deleteProduct);
 router.get("/product/:id", getSingleProduct);
 router.get("/store/:id", storeDetails);
 router.get("/store/:id/products", storeProducts);
+router.get("/seller/all", authenticate, storeProductsBySeller); // only for authenticated store owners
 
 // exports
 module.exports = router;
