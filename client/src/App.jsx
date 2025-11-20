@@ -1,10 +1,11 @@
+import CartProvider from "./hooks/CartContext";
 import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
-    <>
+    <CartProvider>
       <AppRoutes />
-    </>
+    </CartProvider>
   );
 }
 

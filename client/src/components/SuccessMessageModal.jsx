@@ -1,4 +1,5 @@
-import * as React from "react";
+// src/components/SuccessMessageModal.jsx
+import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -6,44 +7,39 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-export default function AlertDialog() {
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+export default function SuccessMessageModal({
+  open,
+  message,
+  onClose,
+  onContinue,
+}) {
   return (
-    <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open alert dialog
-      </Button>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="success-dialog-title"
+      aria-describedby="success-dialog-description"
+    >
+      <DialogTitle id="success-dialog-title">Success!</DialogTitle>
+
+      <DialogContent>
+        <DialogContentText id="success-dialog-description">
+          {message}
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onContinue} autoFocus>
+          Continue Shopping
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
+
+SuccessMessageModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  message: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onContinue: PropTypes.func.isRequired,
+};

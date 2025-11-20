@@ -1,53 +1,62 @@
 // src/hooks/CartContext.jsx
-
 import { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import SuccessMessageModal from "../components/SuccessMessageModal";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 const CartProvider = ({ children }) => {
-  // initialize cart state
+  // Initialize cart from localStorage
   const [cartItems, setCartItems] = useState(() => {
-    const storedCartItems = localStorage.getItem("cartItems");
-    return storedCartItems ? JSON.parse(storedCartItems) : [];
+    try {
+      const stored = localStorage.getItem("cartItems");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
   });
 
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState("");
+  // Modal State
+  const [successModal, setSuccessModal] = useState({
+    open: false,
+    message: "",
+  });
 
+  // Sync cart to localStorage
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // add item to cart
+  // Add item to cart
   const addToCart = (item, quantity = 1) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prevItems.map((i) =>
+    setCartItems((prev) => {
+      const exist = prev.find((i) => i.id === item.id);
+
+      if (exist) {
+        return prev.map((i) =>
           i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
         );
-      } else {
-        return [...prevItems, { ...item, quantity }];
       }
+
+      return [...prev, { ...item, quantity }];
     });
-    // show success message
-    setShowSuccess(true);
-    setShowSuccessMessage(`${item.name} has been added to cart!`);
+
+    setSuccessModal({
+      open: true,
+      message: `${item.name} has been added to your cart!`,
+    });
   };
 
-  // remove item from cart
+  // Remove single item
   const removeFromCart = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setCartItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // clear cart items
-  const clearCart = () => {
-    setCartItems([]);
-  };
+  // Clear entire cart
+  const clearCart = () => setCartItems([]);
 
-  // calculate total amount
+  // Total price
   const cartTotalAmount = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -64,9 +73,14 @@ const CartProvider = ({ children }) => {
       }}
     >
       {children}
-      {showSuccess && (
-        <div className="success-message">{showSuccessMessage}</div>
-      )}
+
+      {/* Success Modal */}
+      <SuccessMessageModal
+        open={successModal.open}
+        message={successModal.message}
+        onClose={() => setSuccessModal({ open: false, message: "" })}
+        onContinue={() => setSuccessModal({ open: false, message: "" })}
+      />
     </CartContext.Provider>
   );
 };
