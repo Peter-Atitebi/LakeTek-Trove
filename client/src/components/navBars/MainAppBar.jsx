@@ -17,6 +17,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
 import useAuthentication from "../../hooks/useAuthentication";
+import { useCart } from "../../hooks/CartContext";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -57,10 +58,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function MainHeader({ title, cartItemCount = 0 }) {
+function MainHeader({ title }) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  ``
+  const { cartItems } = useCart(); 
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const { session } = useAuthentication();
   const isMenuOpen = Boolean(anchorEl);
@@ -143,7 +147,7 @@ function MainHeader({ title, cartItemCount = 0 }) {
     >
       <MenuItem onClick={handleNavigateToCart}>
         <IconButton size="large" color="inherit">
-          <Badge badgeContent={cartItemCount} color="error">
+          <Badge badgeContent={totalItems} color="error">
             <ShoppingCartIcon />
           </Badge>
         </IconButton>
@@ -199,9 +203,9 @@ function MainHeader({ title, cartItemCount = 0 }) {
               size="large"
               color="inherit"
               onClick={handleNavigateToCart}
-              aria-label={`show ${cartItemCount} cart items`}
+              aria-label={`show ${totalItems} cart items`}
             >
-              <Badge badgeContent={cartItemCount} color="error">
+              <Badge badgeContent={totalItems} color="error">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
@@ -239,7 +243,7 @@ function MainHeader({ title, cartItemCount = 0 }) {
 
 MainHeader.propTypes = {
   title: PropTypes.string,
-  cartItemCount: PropTypes.number,
+  totalItems: PropTypes.number,
 };
 
 export default MainHeader;

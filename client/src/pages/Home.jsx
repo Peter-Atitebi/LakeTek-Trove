@@ -2,13 +2,13 @@
 
 import AppLayout from "../components/AppLayout";
 import AppFooter from "../components/footer/AppFooter";
+import HomeFeed from "../components/products/HomeFeed";
 
 const Home = () => {
   return (
     <>
       <AppLayout>
-        <h1>HomePage</h1>
-        <p>This is my home page.</p>
+        <HomeFeed />
       </AppLayout>
 
       {/* Footer */}
