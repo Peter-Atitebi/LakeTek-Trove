@@ -5,6 +5,9 @@ import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
 import LoadingSpinnerBody from "../LoadingSpinnerBody";
 
+const PLACEHOLDER_IMAGE =
+  "https://dummyimage.com/250x250/f5f5f5/999999.png&text=No+Image+Available";
+
 const HomeFeed = () => {
   const [feed, setFeed] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,18 +66,19 @@ const HomeFeed = () => {
                   className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow duration-300"
                 >
                   <img
-                    src={
-                      product.imageUrl ||
-                      "https://dummyimage.com/250x250/f5f5f5/999999.png&text=No+Image+Available"
-                    }
+                    src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = PLACEHOLDER_IMAGE;
+                    }}
                   />
 
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">
                       {product.name}
                     </h3>
+
                     <p className="text-gray-600 mb-4">
                       {new Intl.NumberFormat("en-NG", {
                         style: "currency",
