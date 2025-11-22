@@ -34,7 +34,7 @@ const HomeFeed = () => {
   useEffect(() => {
     loadFeed();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+  }, []);
 
   const renderFeed = () => {
     if (!feed.length) {
@@ -49,27 +49,41 @@ const HomeFeed = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        {feed.map((item) => (
-          <div
-            key={item._id}
-            className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow duration-300"
-          >
-            <img
-              src={item.imageUrl}
-              alt={item.name}
-              className="w-full h-48 object-cover"
-            />
+      <div className="space-y-10 p-4">
+        {feed.map((group) => (
+          <div key={group.category}>
+            {/* Category Title */}
+            <h2 className="text-3xl font-bold mb-4">{group.category}</h2>
 
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {group.products.map((product) => (
+                <div
+                  key={product._id}
+                  className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow duration-300"
+                >
+                  <img
+                    src={
+                      product.imageUrl ||
+                      "https://dummyimage.com/250x250/f5f5f5/999999.png&text=No+Image+Available"
+                    }
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
 
-              <p className="text-gray-600 mb-4">
-                {new Intl.NumberFormat("en-NG", {
-                  style: "currency",
-                  currency: "NGN",
-                }).format(item.price)}
-              </p>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {new Intl.NumberFormat("en-NG", {
+                        style: "currency",
+                        currency: "NGN",
+                      }).format(product.price)}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}

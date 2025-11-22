@@ -219,12 +219,18 @@ const storeProductsBySeller = async (req, res) => {
 const homeFeed = async (req, res) => {
   try {
     const products = await Product.aggregate([
+      // Sort newest first
+      { $sort: { createdAt: -1 } },
+
+      // Group by category
       {
         $group: {
           _id: "$category",
           products: { $push: "$$ROOT" },
         },
       },
+
+      // Limit to 4 per category
       {
         $project: {
           category: "$_id",
@@ -232,23 +238,30 @@ const homeFeed = async (req, res) => {
         },
       },
     ]);
-    const processedProducts = await products.map((productGroup) => {
-      const processedGroup = productGroup.products.map((product) =>
-        processProduct(product)
-      );
-      return {
-        category: productGroup.category,
-        products: processedGroup,
-      };
-    });
 
-    console.log(processedProducts);
-    res.status(200).json(processedProducts);
+    // Process each product
+    const processedProducts = await Promise.all(
+      products.map(async (group) => {
+        const processedGroup = await Promise.all(
+          group.products.map((p) => processProduct(p))
+        );
+
+        return {
+          category: group.category,
+          products: processedGroup.filter(Boolean), // remove nulls
+        };
+      })
+    );
+
+    // Only include categories with at least 1 product
+    const finalFeed = processedProducts.filter((g) => g.products.length > 0);
+
+    res.status(200).json(finalFeed);
   } catch (error) {
-    // Handle errors
-    return res
-      .status(401)
-      .json({ success: false, message: "Server error: " + error });
+    res.status(500).json({
+      success: false,
+      message: "Server error: " + error.message,
+    });
   }
 };
 
