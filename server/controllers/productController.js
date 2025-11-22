@@ -216,6 +216,42 @@ const storeProductsBySeller = async (req, res) => {
   }
 };
 
+const homeFeed = async (req, res) => {
+  try {
+    const products = await Product.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          products: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $project: {
+          category: "$_id",
+          products: { $slice: ["$products", 4] },
+        },
+      },
+    ]);
+    const processedProducts = await products.map((productGroup) => {
+      const processedGroup = productGroup.products.map((product) =>
+        processProduct(product)
+      );
+      return {
+        category: productGroup.category,
+        products: processedGroup,
+      };
+    });
+
+    console.log(processedProducts);
+    res.status(200).json(processedProducts);
+  } catch (error) {
+    // Handle errors
+    return res
+      .status(401)
+      .json({ success: false, message: "Server error: " + error });
+  }
+};
+
 module.exports = {
   createProduct,
   deleteProduct,
@@ -224,4 +260,5 @@ module.exports = {
   storeDetails,
   storeProducts,
   storeProductsBySeller,
+  homeFeed,
 };
