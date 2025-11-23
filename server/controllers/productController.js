@@ -267,7 +267,7 @@ const homeFeed = async (req, res) => {
 
 // Get all products in a category (paginated)
 const categoryProducts = async (req, res) => {
-  const { category } = req.params;
+  const category = req.query.name;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 24;
   const startIndex = (page - 1) * limit;
@@ -279,7 +279,6 @@ const categoryProducts = async (req, res) => {
   }
 
   try {
-    // Find products matching the category (case-insensitive) with pagination
     const products = await Product.find({
       category: { $regex: `^${category}$`, $options: "i" },
     })
@@ -292,7 +291,6 @@ const categoryProducts = async (req, res) => {
       category: { $regex: `^${category}$`, $options: "i" },
     });
 
-    // Process products
     const processedProducts = await Promise.all(
       products.map((product) => processProduct(product))
     );

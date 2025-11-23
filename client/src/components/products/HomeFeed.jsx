@@ -60,6 +60,7 @@ const HomeFeed = () => {
               <Link
                 to={`/category/${encodeURIComponent(group.category)}`}
                 className="text-blue-500 hover:underline text-sm"
+                target="_blank"
               >
                 See All
               </Link>

@@ -57,7 +57,6 @@ router.get("/store/:id", storeDetails);
 router.get("/store/:id/products", storeProducts);
 router.get("/seller/all", authenticate, storeProductsBySeller); // only for authenticated store owners
 router.get("/home-feed", homeFeed);
-// Get all products by category
 router.get("/category/:category", categoryProducts);
 
 // exports
