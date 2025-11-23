@@ -312,7 +312,53 @@ const categoryProducts = async (req, res) => {
       .json({ success: false, message: "Server error: " + error.message });
   }
 };
+// Get best deals (products with priceBefore > price)
+const bestDeals = async (req, res) => {
+  try {
+    const products = await Product.find({
+      $expr: {
+        $and: [
+          { $gt: ["$priceBefore", "$price"] },
+          {
+            $gte: [
+              {
+                $multiply: [
+                  {
+                    $divide: [
+                      { $subtract: ["$priceBefore", "$price"] },
+                      "$priceBefore",
+                    ],
+                  },
+                  100,
+                ],
+              },
+              20,
+            ],
+          },
+        ],
+      },
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
 
+    // Handle empty results
+    if (!products || products.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const processedProducts = await Promise.all(
+      products.map((product) => processProduct(product))
+    );
+
+    res.status(200).json(processedProducts);
+  } catch (error) {
+    console.error("Best deals error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error: " + error.message,
+    });
+  }
+};
 module.exports = {
   createProduct,
   deleteProduct,
@@ -323,4 +369,5 @@ module.exports = {
   storeProductsBySeller,
   homeFeed,
   categoryProducts,
+  bestDeals,
 };

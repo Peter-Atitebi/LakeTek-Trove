@@ -46,6 +46,7 @@ const {
   storeProductsBySeller,
   homeFeed,
   categoryProducts,
+  bestDeals,
 } = require("../controllers/productController");
 
 // routes
@@ -58,6 +59,7 @@ router.get("/store/:id/products", storeProducts);
 router.get("/seller/all", authenticate, storeProductsBySeller); // only for authenticated store owners
 router.get("/home-feed", homeFeed);
 router.get("/category/:category", categoryProducts);
+router.get("/best-deals", bestDeals);
 
 // exports
 module.exports = router;
