@@ -45,8 +45,8 @@ const {
   storeProducts,
   storeProductsBySeller,
   homeFeed,
+  categoryProducts,
 } = require("../controllers/productController");
-
 
 // routes
 router.post("/create", [authenticate, upload.single("image")], createProduct);
@@ -56,7 +56,9 @@ router.get("/product/:id", getSingleProduct);
 router.get("/store/:id", storeDetails);
 router.get("/store/:id/products", storeProducts);
 router.get("/seller/all", authenticate, storeProductsBySeller); // only for authenticated store owners
-router.get("/home-feed", homeFeed); 
+router.get("/home-feed", homeFeed);
+// Get all products by category
+router.get("/category/:category", categoryProducts);
 
 // exports
 module.exports = router;

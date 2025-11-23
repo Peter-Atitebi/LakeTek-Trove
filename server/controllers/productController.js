@@ -265,6 +265,57 @@ const homeFeed = async (req, res) => {
   }
 };
 
+// Get all products in a category (paginated)
+const categoryProducts = async (req, res) => {
+  const { category } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 24;
+  const startIndex = (page - 1) * limit;
+
+  if (!category) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Category is required" });
+  }
+
+  try {
+    // Find products matching the category (case-insensitive) with pagination
+    const products = await Product.find({
+      category: { $regex: `^${category}$`, $options: "i" },
+    })
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit)
+      .lean();
+
+    const totalProducts = await Product.countDocuments({
+      category: { $regex: `^${category}$`, $options: "i" },
+    });
+
+    // Process products
+    const processedProducts = await Promise.all(
+      products.map((product) => processProduct(product))
+    );
+
+    res.status(200).json({
+      category,
+      products: processedProducts.filter(Boolean),
+      pagination: {
+        currentPage: page,
+        totalProducts,
+        totalPages: Math.ceil(totalProducts / limit),
+        productsPerPage: limit,
+        hasMore: page * limit < totalProducts,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching category products:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error: " + error.message });
+  }
+};
+
 module.exports = {
   createProduct,
   deleteProduct,
@@ -274,4 +325,5 @@ module.exports = {
   storeProducts,
   storeProductsBySeller,
   homeFeed,
+  categoryProducts,
 };

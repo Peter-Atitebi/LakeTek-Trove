@@ -4,6 +4,7 @@ import axios from "axios";
 import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
 import LoadingSpinnerBody from "../LoadingSpinnerBody";
+import { Link } from "react-router-dom";
 
 const PLACEHOLDER_IMAGE =
   "https://dummyimage.com/250x250/f5f5f5/999999.png&text=No+Image+Available";
@@ -25,7 +26,6 @@ const HomeFeed = () => {
           Authorization: `Bearer ${session?.token}`,
         },
       });
-
       setFeed(response.data || []);
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
@@ -36,7 +36,6 @@ const HomeFeed = () => {
 
   useEffect(() => {
     loadFeed();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderFeed = () => {
@@ -55,39 +54,79 @@ const HomeFeed = () => {
       <div className="space-y-10 p-4">
         {feed.map((group) => (
           <div key={group.category}>
-            {/* Category Title */}
-            <h2 className="text-3xl font-bold mb-4">{group.category}</h2>
+            {/* Category Title + See All */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-3xl font-bold">{group.category}</h2>
+              <Link
+                to={`/category/${encodeURIComponent(group.category)}`}
+                className="text-blue-500 hover:underline text-sm"
+              >
+                See All
+              </Link>
+            </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {group.products.map((product) => (
-                <div
-                  key={product._id}
-                  className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow duration-300"
-                >
-                  <img
-                    src={product.image || PLACEHOLDER_IMAGE}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = PLACEHOLDER_IMAGE;
-                    }}
-                  />
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {group.products.map((product) => {
+                const hasDiscount =
+                  product.priceBefore && product.priceBefore > product.price;
 
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {product.name}
-                    </h3>
+                const discountPercentage = hasDiscount
+                  ? Math.round(
+                      ((product.priceBefore - product.price) /
+                        product.priceBefore) *
+                        100
+                    )
+                  : 0;
 
-                    <p className="text-gray-600 mb-4">
-                      {new Intl.NumberFormat("en-NG", {
-                        style: "currency",
-                        currency: "NGN",
-                      }).format(product.price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                return (
+                  <Link
+                    key={product._id}
+                    to={`/store/${product.storeId}?productId=${product.id}`}
+                    className="block"
+                  >
+                    <div className="relative border rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow duration-300">
+                      {/* Discount Badge */}
+                      {hasDiscount && (
+                        <span className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+                          -{discountPercentage}%
+                        </span>
+                      )}
+
+                      <img
+                        src={product.image || PLACEHOLDER_IMAGE}
+                        alt={product.name}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = PLACEHOLDER_IMAGE;
+                        }}
+                      />
+
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-2">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-gray-600 mb-4">
+                          {new Intl.NumberFormat("en-NG", {
+                            style: "currency",
+                            currency: "NGN",
+                          }).format(product.price)}
+
+                          {hasDiscount && (
+                            <span className="line-through text-gray-400 ml-2">
+                              {new Intl.NumberFormat("en-NG", {
+                                style: "currency",
+                                currency: "NGN",
+                              }).format(product.priceBefore)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         ))}
