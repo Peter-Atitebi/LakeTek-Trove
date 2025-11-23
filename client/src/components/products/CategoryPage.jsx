@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
 import PLACEHOLDER_IMAGE from "../../utils/api";
+import ProductRating from "../../components/products/ProductRating";
 
 const CategoryPage = () => {
   const { category } = useParams();
@@ -107,6 +108,8 @@ const CategoryPage = () => {
                       <h3 className="text-lg font-semibold mb-2 text-gray-800 line-clamp-2 group-hover:text-orange-500 transition-colors">
                         {product.name}
                       </h3>
+
+                      <ProductRating rating={product.rating} />
 
                       {/* Price Section */}
                       <div className="flex items-center gap-2 flex-wrap">

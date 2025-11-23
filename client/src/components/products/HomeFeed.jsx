@@ -6,6 +6,7 @@ import useAuthentication from "../../hooks/useAuthentication";
 import LoadingSpinnerBody from "../LoadingSpinnerBody";
 import { Link } from "react-router-dom";
 import PLACEHOLDER_IMAGE from "../../utils/api";
+import ProductRating from "../../components/products/ProductRating";
 
 const HomeFeed = () => {
   const [feed, setFeed] = useState([]);
@@ -105,6 +106,8 @@ const HomeFeed = () => {
                         <h3 className="text-lg font-semibold mb-2">
                           {product.name}
                         </h3>
+
+                        <ProductRating rating={product.rating} />
 
                         <p className="text-gray-600 mb-4">
                           {new Intl.NumberFormat("en-NG", {
