@@ -5,9 +5,7 @@ import { SERVER_BASE_URL } from "../../utils/api";
 import useAuthentication from "../../hooks/useAuthentication";
 import LoadingSpinnerBody from "../LoadingSpinnerBody";
 import { Link } from "react-router-dom";
-
-const PLACEHOLDER_IMAGE =
-  "https://dummyimage.com/250x250/f5f5f5/999999.png&text=No+Image+Available";
+import PLACEHOLDER_IMAGE from "../../utils/api";
 
 const HomeFeed = () => {
   const [feed, setFeed] = useState([]);
