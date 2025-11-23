@@ -267,7 +267,8 @@ const homeFeed = async (req, res) => {
 
 // Get all products in a category (paginated)
 const categoryProducts = async (req, res) => {
-  const category = req.query.name;
+  const category = decodeURIComponent(req.params.category);
+
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 24;
   const startIndex = (page - 1) * limit;
@@ -279,25 +280,24 @@ const categoryProducts = async (req, res) => {
   }
 
   try {
-    const products = await Product.find({
-      category: { $regex: `^${category}$`, $options: "i" },
-    })
+    const regex = new RegExp(category, "i");
+
+    const products = await Product.find({ category: regex })
       .sort({ createdAt: -1 })
       .skip(startIndex)
       .limit(limit)
       .lean();
 
-    const totalProducts = await Product.countDocuments({
-      category: { $regex: `^${category}$`, $options: "i" },
-    });
+    const totalProducts = await Product.countDocuments({ category: regex });
 
+    // ADD THIS: Process products to get proper image URLs
     const processedProducts = await Promise.all(
       products.map((product) => processProduct(product))
     );
 
     res.status(200).json({
       category,
-      products: processedProducts.filter(Boolean),
+      products: processedProducts, // ← Use processed products
       pagination: {
         currentPage: page,
         totalProducts,
@@ -307,7 +307,6 @@ const categoryProducts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching category products:", error);
     res
       .status(500)
       .json({ success: false, message: "Server error: " + error.message });
