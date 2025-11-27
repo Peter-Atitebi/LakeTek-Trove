@@ -2,7 +2,8 @@
 
 const categories = [
   {
-    "Mobile & Accessories": [
+    name: "Mobile & Accessories",
+    subcategories: [
       "Smartphones",
       "Feature Phones",
       "Tablets",
@@ -15,10 +16,11 @@ const categories = [
       "Bluetooth Speakers",
       "Smart Pens & Styluses",
       "Cables (USB-C, Lightning, HDMI, etc.)",
-      ,
     ],
-
-    "Computers & Laptops": [
+  },
+  {
+    name: "Computers & Laptops",
+    subcategories: [
       "Laptops",
       "Desktops",
       "Computer Accessories (mice, keyboards, cooling pads, laptop stands)",
@@ -27,29 +29,34 @@ const categories = [
       "Networking Devices (Wi-Fi routers, mesh systems, modems, extenders)",
       "Docking Stations & Hubs",
       "Laptop Batteries & Chargers",
-      ,
     ],
-
-    "Wearables & Smart Devices": [
+  },
+  {
+    name: "Wearables & Smart Devices",
+    subcategories: [
       "Smartwatches",
       "Fitness Bands",
       "AR/VR Headsets",
       "Smart Glasses",
       "Health Trackers",
-      ,
+      
     ],
-
-    "Gaming & Entertainment": [
+  },
+  {
+    name: "Gaming & Entertainment",
+    subcategories: [
       "Gaming Consoles",
       "Gaming Accessories (controllers, headsets, racing wheels)",
       "PC Gaming Accessories (gaming mice, mechanical keyboards, RGB gear)",
       "Streaming Devices (Chromecast, Fire Stick, Apple TV, Roku)",
       "Projectors",
       "Drones",
-      ,
+      
     ],
-
-    "Cameras & Photography": [
+  },
+  {
+    name: "Cameras & Photography",
+    subcategories: [
       "Digital Cameras",
       "Action Cameras (GoPro, Insta360)",
       "Lenses",
@@ -58,49 +65,62 @@ const categories = [
       "Lighting Equipment (ring lights, softboxes, LED panels)",
       "Memory Cards & Readers",
       "Camera Bags & Cases",
-      ,
+      
     ],
-
-    "Audio & Music Electronics": [
+  },
+  {
+    name: "Audio & Music Electronics",
+    subcategories: [
       "Home Audio Systems",
       "Bluetooth & Portable Speakers",
       "Professional Audio (mixers, studio monitors, microphones)",
       "Musical Electronics",
-      ,
+      
     ],
-
-    "TVs & Display Tech": [
+  },
+  {
+    name: "TVs & Display Tech",
+    subcategories: [
       "Televisions",
       "TV Accessories (remotes, wall mounts, stands)",
-      ,
+      
     ],
-
-    "Home & Office Electronics": [
+  },
+  {
+    name: "Home & Office Electronics",
+    subcategories: [
       "Printers & Scanners",
       "Projectors",
       "Smart Home Devices (CCTV, smart bulbs, smart plugs, Alexa, Google Home)",
       "Office Electronics (shredders, laminators, conference gadgets)",
-      ,
+      
     ],
-
-    "Power & Energy Electronics": [
+  },
+  {
+    name: "Power & Energy Electronics",
+    subcategories: [
       "UPS (Uninterruptible Power Supplies)",
       "Inverters",
       "Stabilizers",
       "Solar Panels & Controllers",
       "Rechargeable Fans & Lamps",
-      ,
+      
     ],
-
-    "Automotive Electronics": [
+  },
+  {
+    name: "Automotive Electronics",
+    subcategories: [
       "Car Stereos & Speakers",
       "Car Chargers & Mounts",
       "Dash Cameras",
       "GPS Navigation Systems",
       "Car Security Systems",
-      ,
+      
     ],
-    Other: [],
+  },
+  {
+    name: "Other",
+    subcategories: [],
   },
 ];
 

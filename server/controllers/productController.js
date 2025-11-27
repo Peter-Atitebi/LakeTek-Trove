@@ -339,7 +339,7 @@ const bestDeals = async (req, res) => {
       },
     })
       .sort({ createdAt: -1 })
-      .limit(20);
+      .limit(10);
 
     // Handle empty results
     if (!products || products.length === 0) {
