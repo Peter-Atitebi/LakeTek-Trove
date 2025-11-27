@@ -5,8 +5,8 @@ import GallerySlider from "./GallerySlider";
 import useAuthentication from "../../hooks/useAuthentication";
 import { SERVER_BASE_URL } from "../../utils/api";
 import LoadingSpinnerBody from "../LoadingSpinnerBody";
-import CategoriesList from "../../hooks/CategoriesList";
-import categories from "../../hooks/CategoriesList";
+import CList from "../../hooks/CList";
+import ctgories from "../../hooks/CList";
 import { Link } from "react-router-dom";
 
 const BestDeals = () => {
@@ -70,7 +70,7 @@ const BestDeals = () => {
 
         {/* Category List */}
         <div className="mt-4">
-          {categories.map((category, index) => (
+          {ctgories.map((category, index) => (
             <div key={index} className="mb-3">
               <Link to={`/categories/${category.id}`}>{category.name}</Link>
             </div>
