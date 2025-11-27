@@ -3,6 +3,7 @@ import AppLayout from "../components/AppLayout";
 import AppFooter from "../components/footer/AppFooter";
 import HomeFeed from "../components/products/HomeFeed";
 import BestDeals from "../components/products/BestDeals";
+import RecentlyViewed from "../components/products/RecentlyViewed";
 
 const Home = () => {
   return (
@@ -15,6 +16,7 @@ const Home = () => {
         <HomeFeed />
 
         {/* Recently Viewed */}
+        <RecentlyViewed />
       </AppLayout>
 
       {/* Footer */}
