@@ -82,7 +82,7 @@ const RecentlyViewed = () => {
             >
               <div className="border rounded-lg p-3 sm:p-4 hover:shadow-lg transition-shadow duration-200">
                 <img
-                  src={product.image || PLACEHOLDER_IMAGE}
+                  src={product.image}
                   alt={product.name}
                   className="w-full h-40 sm:h-48 md:h-56 object-cover mb-3 sm:mb-4 rounded"
                   onError={(e) => {
