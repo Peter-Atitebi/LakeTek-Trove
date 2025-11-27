@@ -7,6 +7,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Button from "@mui/material/Button";
 import ProductOptions from "./ProductOptions";
+import UpdateRecentlyViewed from "../../hooks/UpdateRecentlyViewed";
 
 // Price formatting utility
 const formatPrice = (price, decimals = 2) => {
@@ -28,6 +29,10 @@ const SingleProduct = ({
   onDelete,
   onDuplicate,
 }) => {
+
+  // update recently viewed products in localStorage
+  UpdateRecentlyViewed({ product });
+
   // Early return if product is null/undefined
   if (!product || Object.keys(product).length === 0) {
     return (

@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import { useRef, useEffect } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -8,6 +9,22 @@ import ProductRating from "../../components/products/ProductRating";
 const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200";
 
 const GallerySlider = ({ products = [], isOpenCategory = false }) => {
+  const sliderRef = useRef(null);
+
+  // Arrow key navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowLeft") {
+        sliderRef.current?.slickPrev();
+      } else if (e.key === "ArrowRight") {
+        sliderRef.current?.slickNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
@@ -77,7 +94,7 @@ const GallerySlider = ({ products = [], isOpenCategory = false }) => {
         }
       `}</style>
 
-      <Slider {...settings}>
+      <Slider ref={sliderRef} {...settings}>
         {products.map((product, index) => {
           const hasDiscount =
             product.priceBefore && product.priceBefore > product.price;

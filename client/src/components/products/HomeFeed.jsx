@@ -105,6 +105,7 @@ const HomeFeed = () => {
                     key={product._id || product.id || `product-${productIndex}`}
                     to={`/store/${product.storeId}?productId=${product.id}`}
                     className="block group"
+                    target="_blank"
                   >
                     <div className="relative bg-white border border-gray-100 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       {/* Discount Badge */}
