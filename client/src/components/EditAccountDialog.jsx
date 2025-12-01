@@ -31,10 +31,9 @@ const EditAccountDialog = ({ open, onClose, onSave }) => {
     setError(null);
     setSuccess(false);
 
-    
     try {
       const response = await axios.patch(
-        `${SERVER_BASE_URL}auth/update`,
+        `${SERVER_BASE_URL}auth/update/${accountDetails.id}`,
         accountDetails,
         {
           headers: {

@@ -157,6 +157,48 @@ const authController = {
       });
     }
   },
+
+  updateUser: async (req, res) => {
+    const { name, email, id } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all fields",
+      });
+    }
+
+    console.log(req.body);
+
+    try {
+      // check if the user exists
+      const existingUser = await User.findById(req.params.id);
+      if (!existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: "User does not exist",
+        });
+      }
+
+      // update the user
+      existingUser.name = name;
+      existingUser.email = email;
+
+      // save the user
+      await existingUser.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+      });
+    } catch (error) {
+      console.error("Update user error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
 };
 
 module.exports = authController;

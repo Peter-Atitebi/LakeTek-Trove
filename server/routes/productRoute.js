@@ -61,5 +61,6 @@ router.get("/home-feed", homeFeed);
 router.get("/category/:category", categoryProducts);
 router.get("/best-deals", bestDeals);
 
+
 // exports
 module.exports = router;
