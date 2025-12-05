@@ -16,7 +16,7 @@ import {
   FormControl,
 } from "@mui/material";
 import { SERVER_BASE_URL } from "../utils/api";
-import { useAuthentication } from "../../../hooks/useAuthentication";
+import useAuthentication from "../hooks/useAuthentication";
 
 const DeliveryTrackingDialog = ({ open, onClose, order, onUpdate }) => {
   const [status, setStatus] = useState("Pending");

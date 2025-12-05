@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { SERVER_BASE_URL } from "../../../utils/api";
-import { useAuthentication } from "../../../hooks/useAuthentication";
+import useAuthentication from "../../../hooks/useAuthentication";
 import truncateText from "../../../hooks/truncateText";
 import ManyProductsDetailsDialog from "../../../components/products/ManyProductsDetailsDialog";
 import DeliveryTrackingDialog from "../../../components/DeliveryTrackingDialog";
