@@ -16,7 +16,7 @@ import {
 import { SERVER_BASE_URL } from "../../../utils/api";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import truncateText from "../../../hooks/truncateText";
-import ManyProductsDetailsDialog from "./product/ManyProductsDetailsDialog";
+import ManyProductsDetailsDialog from "../../../components/products/ManyProductsDetailsDialog";
 import DeliveryTrackingDialog from "../../../components/DeliveryTrackingDialog";
 import LoadingSpinnerBody from "../../../components/LoadingSpinnerBody";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
