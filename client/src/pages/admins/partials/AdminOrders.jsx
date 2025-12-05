@@ -47,7 +47,7 @@ const AdminOrders = () => {
       const lowerSearchQuery = searchQuery.toLowerCase();
       const filtered = orders.filter(
         (order) =>
-          order._id.toLowerCase().includes(lowerSearchQuery) ||
+          order.id.toLowerCase().includes(lowerSearchQuery) ||
           order.customer?.name?.toLowerCase().includes(lowerSearchQuery) ||
           new Date(order.createdAt)
             .toLocaleDateString()
@@ -107,7 +107,11 @@ const AdminOrders = () => {
       setIsDialogOpenTracking(true);
     }
   };
- 
+
+  const handleCloseDialogTracking = () => {
+    setIsDialogOpenTracking(false);
+  };
+
   const handleUpdateTracking = (delivery) => {
     if (delivery) {
       console.log("Delivery info:", delivery);
@@ -211,7 +215,7 @@ const AdminOrders = () => {
           return (
             <span className="text-yellow-500 space-x-2">
               <span>In Transit</span>
-              {/* <FontAwesomeicon icon={faTruck} /> */}
+
               <LocalShippingIcon />
             </span>
           );
@@ -249,8 +253,104 @@ const AdminOrders = () => {
 
   return (
     <div>
-      <h1>Admin Orders</h1>
-      <p>Here you can manage all orders.</p>
+      <div>
+        <Typography variant="h4" gutterBottom>
+          Manage Orders
+        </Typography>
+        <input
+          type="search"
+          placeholder="Search Orders"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="border p-2 mb-4 w-full"
+        />
+      </div>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Order ID</TableCell>
+              <TableCell>Products</TableCell>
+              <TableCell>Customer</TableCell>
+              <TableCell>Payment</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Delivery</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredOrders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{truncateText(order.id, 24)}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleOpenProductDialog(order)}
+                  >
+                    View Details ({order.products.length})
+                  </Button>
+                </TableCell>
+                <TableCell>{truncateText(order.customer?.name)}</TableCell>
+                <TableCell>
+                  <span
+                    className={
+                      order.paymentStatus === "Completed"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }
+                  >
+                    {order.paymentStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  ₦
+                  {order.totalAmount.toLocaleString("en-NG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </TableCell>
+                <TableCell>
+                  {order.createdAt
+                    ? new Date(order.createdAt).toLocaleDateString()
+                    : "N/A"}
+                </TableCell>
+                <TableCell>{showDeliveryStatus(order.delivery)}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleMarkedAsDelivered(order)}
+                    disabled={order.status === "Delivered"}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    Tracking
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {selectedProducts && selectedProducts.length > 0 && (
+        <ManyProductsDetailsDialog
+          open={openProductDialog}
+          onClose={handleCloseProductDialog}
+          products={selectedProducts}
+        />
+      )}
+
+      {selectedOrder && (
+        <DeliveryTrackingDialog
+          open={isDialogOpenTracking}
+          onClose={handleCloseDialogTracking}
+          order={selectedOrder}
+          onUpdate={handleUpdateTracking}
+        />
+      )}
     </div>
   );
 };
