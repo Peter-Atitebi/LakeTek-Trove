@@ -33,7 +33,7 @@ const EditAccountDialog = ({ open, onClose, onSave }) => {
 
     try {
       const response = await axios.patch(
-        `${SERVER_BASE_URL}auth/update/${accountDetails.id}`,
+        `${SERVER_BASE_URL}/auth/update/${accountDetails.id}`,
         accountDetails,
         {
           headers: {

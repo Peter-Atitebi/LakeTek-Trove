@@ -12,8 +12,8 @@ const DeliveryTrackingSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "shipped", "in_transit", "delivered", "cancelled"],
-      default: "pending",
+      enum: ["Pending", "Shipped", "In Transit", "Delivered", "Cancelled"],
+      default: "Pending",
       required: true,
     },
 

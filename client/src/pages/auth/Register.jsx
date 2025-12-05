@@ -36,8 +36,8 @@ const SignUp = async (formElement) => {
 
   const url =
     role && role === "manager"
-      ? `${SERVER_BASE_URL}manager/register`
-      : `${SERVER_BASE_URL}auth/register`;
+      ? `${SERVER_BASE_URL}/manager/register`
+      : `${SERVER_BASE_URL}/auth/register`;
 
   const data = {
     name,

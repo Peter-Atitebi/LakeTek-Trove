@@ -26,7 +26,7 @@ const BestDeals = () => {
     setErrorMessage("");
 
     try {
-      const res = await axios.get(`${SERVER_BASE_URL}products/best-deals`, {
+      const res = await axios.get(`${SERVER_BASE_URL}/products/best-deals`, {
         headers: {
           Authorization: `Bearer ${session.token}`,
         },

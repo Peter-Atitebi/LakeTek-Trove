@@ -23,7 +23,7 @@ const SignIn = async (formData) => {
   const email = formData.email;
   const password = formData.password;
 
-  const url = `${SERVER_BASE_URL}auth/login`;
+  const url = `${SERVER_BASE_URL}/auth/login`;
   console.log(url);
 
   try {
@@ -53,7 +53,7 @@ const Login = () => {
 
     dispatch(loginStart());
     try {
-      const res = await axios.post(`${SERVER_BASE_URL}auth/login`, {
+      const res = await axios.post(`${SERVER_BASE_URL}/auth/login`, {
         email,
         password,
       });

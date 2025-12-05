@@ -64,7 +64,7 @@ const AdminOrders = () => {
       if (isLoading) return;
       setIsLoading(true);
       try {
-        const res = await axios.get(`${SERVER_BASE_URL}orders/manager`, {
+        const res = await axios.get(`${SERVER_BASE_URL}/orders/manager`, {
           headers: {
             Authorization: `Bearer ${session?.token}`,
           },
@@ -147,7 +147,7 @@ const AdminOrders = () => {
     if (session && session.token) {
       setIsSearching(true);
       try {
-        const res = await axios.get(`${SERVER_BASE_URL}manager/orders/search`, {
+        const res = await axios.get(`${SERVER_BASE_URL}/manager/orders/search`, {
           headers: {
             Authorization: `Bearer ${session?.token}`,
           },
@@ -323,7 +323,7 @@ const AdminOrders = () => {
                     color="secondary"
                     size="small"
                     onClick={() => handleMarkedAsDelivered(order)}
-                    disabled={order.status === "Delivered"}
+                    disabled={order.delivery?.status === "Delivered"}
                     style={{ marginLeft: "10px" }}
                   >
                     Tracking

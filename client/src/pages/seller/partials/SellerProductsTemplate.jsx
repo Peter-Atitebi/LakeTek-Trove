@@ -24,7 +24,7 @@ const SellerProductsTemplate = () => {
     setErrorMessage("");
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/seller/all`,
+        `${SERVER_BASE_URL}/products/seller/all`,
         {
           headers: {
             "Content-Type": "application/json",

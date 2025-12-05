@@ -28,7 +28,7 @@ const CategoryPage = () => {
     setErrorMessage("");
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/category/${encodeURIComponent(category)}`,
+        `${SERVER_BASE_URL}/products/category/${encodeURIComponent(category)}`,
         {
           headers: {
             "Content-Type": "application/json",

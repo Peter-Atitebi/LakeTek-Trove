@@ -59,7 +59,7 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
 
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/product/${prodId}`,
+        `${SERVER_BASE_URL}/products/product/${prodId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -95,7 +95,7 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
 
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/store/${storeIdParam}`
+        `${SERVER_BASE_URL}/products/store/${storeIdParam}`
       );
       console.log("Store response:", response.data);
 
@@ -116,7 +116,7 @@ const StoreTemplate = ({ productRating = 3, sellerRating = 4.5 }) => {
   const getStoreProducts = async (storeIdParam) => {
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}products/store/${storeIdParam}/products`
+        `${SERVER_BASE_URL}/products/store/${storeIdParam}/products`
       );
 
       if (response.status === 200) {

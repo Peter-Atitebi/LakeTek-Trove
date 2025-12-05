@@ -19,7 +19,7 @@ const HomeFeed = () => {
     setErrorMessage("");
 
     try {
-      const response = await axios.get(`${SERVER_BASE_URL}products/home-feed`, {
+      const response = await axios.get(`${SERVER_BASE_URL}/products/home-feed`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.token}`,
