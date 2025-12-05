@@ -62,23 +62,11 @@ const orderSchema = new Schema(
       },
       required: true,
     },
-    paymentMethod: {
-      type: String,
-      required: true,
-    },
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "completed", "failed"],
-      default: "pending",
-    },
+   
     shippingMethod: {
       type: String,
       enum: ["standard", "express", "overnight"],
       default: "standard",
-    },
-    shippingCost: {
-      type: Number,
-      required: true,
     },
     orderDate: {
       type: Date,
@@ -95,16 +83,6 @@ const orderSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-    },
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
-    paymentResult: {
-      id: { type: String },
-      status: { type: String },
-      update_time: { type: String },
-      email_address: { type: String },
     },
     isDelivered: {
       type: Boolean,
