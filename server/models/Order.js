@@ -35,42 +35,12 @@ const orderSchema = new Schema({
     default: "pending",
   },
   shippingAddress: {
-    address: {
-      type: String,
-      required: true,
-    },
-    state: {
-      type: String,
-      required: false,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    postalCode: {
-      type: String,
-      required: true,
-    },
-    country: {
-      type: String,
-      required: true,
-    },
-    phone: {
-      type: String,
-      required: true,
-    },
-  },
-
-  orderDate: {
-    type: Date,
-    default: Date.now,
-  },
-
-  orderNumber: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ShippingAddress",
     required: true,
-    unique: true,
   },
+
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Order = mongoose.model("Order", orderSchema);

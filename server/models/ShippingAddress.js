@@ -18,7 +18,7 @@ const shippingAddressSchema = new Schema({
   },
   state: {
     type: String,
-    required: true,
+    required: false,
   },
   postalCode: {
     type: String,
@@ -28,11 +28,21 @@ const shippingAddressSchema = new Schema({
     type: String,
     required: true,
   },
-  isDefault: {
-    type: Boolean,
-    default: false,
+  phone: {
+    type: String,
+    required: true,
   },
-});
+  zipCode: {
+    type: String,
+    required: false,
+  },
+  pinCode: {
+    type: String,
+    required: false,
+  },
+},
+{ timestamps: true }
+);
 
 const ShippingAddress = mongoose.model("ShippingAddress", shippingAddressSchema);
 
