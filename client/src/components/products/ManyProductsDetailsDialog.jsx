@@ -87,6 +87,9 @@ const ManyProductsDetailsDialog = ({ open, onClose, products }) => {
                       <TableCell align="right">
                         {formatCurrency(product.discount)}
                       </TableCell>
+                      <TableCell align="right">
+                        {formatCurrency(product.priceBefore)}
+                      </TableCell>
                       <TableCell align="right">{product.stock}</TableCell>
                       <TableCell align="right">{item.quantity}</TableCell>
                     </TableRow>

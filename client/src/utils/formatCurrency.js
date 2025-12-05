@@ -1,6 +1,6 @@
 // utils/formatCurrency.js
 
-export const formatCurrency = (amount, currency = "NGN", locale = "en-NG") => {
+export const formatCurrency = (amount, currency = "NGN") => {
   if (amount === null || amount === undefined) return "N/A";
 
   const currencySymbols = {
@@ -70,7 +70,7 @@ export const formatCurrency = (amount, currency = "NGN", locale = "en-NG") => {
     ETH: "Ξ", // Ethereum
   };
 
-  return `${currencySymbols[currency] || ""}${amount.toLocaleString(locale, {
+  return `${currencySymbols[currency] || ""}${amount.toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
