@@ -105,7 +105,7 @@ const ManyProductsDetailsDialog = ({ open, onClose, products }) => {
         </DialogContent>
       )}
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} color="primary" aria-label="Close dialog">
           Close
         </Button>
       </DialogActions>
@@ -113,10 +113,28 @@ const ManyProductsDetailsDialog = ({ open, onClose, products }) => {
   );
 };
 
+// Define prop types to ensure proper usage of props
 ManyProductsDetailsDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  products: PropTypes.array.isRequired,
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      product: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        name: PropTypes.string.isRequired,
+        description: PropTypes.string,
+        price: PropTypes.number.isRequired,
+        discount: PropTypes.number,
+        priceBefore: PropTypes.number,
+        category: PropTypes.string,
+        subcategory: PropTypes.string,
+        stock: PropTypes.number,
+        imageUrl: PropTypes.string,
+      }).isRequired,
+      quantity: PropTypes.number.isRequired,
+    })
+  ).isRequired,
 };
 
 export default ManyProductsDetailsDialog;
