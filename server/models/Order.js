@@ -60,14 +60,8 @@ const orderSchema = new Schema(
         type: String,
         required: true,
       },
-      required: true,
     },
    
-    shippingMethod: {
-      type: String,
-      enum: ["standard", "express", "overnight"],
-      default: "standard",
-    },
     orderDate: {
       type: Date,
       default: Date.now,
