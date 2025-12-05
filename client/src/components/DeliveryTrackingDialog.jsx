@@ -115,11 +115,13 @@ const DeliveryTrackingDialog = ({ open, onClose, order, onUpdate }) => {
           margin="normal"
           value={estimatedDeliveryDate}
           onChange={(e) => setEstimatedDeliveryDate(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{
-            min: today,
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+            htmlInput: {
+              min: today,
+            },
           }}
         />
         <TextField
@@ -134,10 +136,10 @@ const DeliveryTrackingDialog = ({ open, onClose, order, onUpdate }) => {
         {error && <p style={{ color: "red" }}>{error}</p>}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+        <Button onClick={onClose} disabled={loading} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleUpdate} disabled={loading}>
+        <Button onClick={handleUpdate} disabled={loading} color="primary">
           {loading ? "Updating..." : "Update"}
         </Button>
       </DialogActions>
