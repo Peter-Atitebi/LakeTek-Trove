@@ -60,27 +60,31 @@ const AdminOrders = () => {
   }, [searchQuery, orders]);
 
   const getOrders = async () => {
-    try {
+    if (session && session.token) {
+      if (isLoading) return;
       setIsLoading(true);
-      const response = await axios.get(
-        `${SERVER_BASE_URL}orders/manager/orders`,
-        {
+      try {
+        const res = await axios.get(`${SERVER_BASE_URL}orders/manager`, {
           headers: {
-            Authorization: `Bearer ${session.token}`,
+            Authorization: `Bearer ${session?.token}`,
           },
-        }
-      );
-      setOrders(response.data.orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      setError("Failed to fetch orders. Please try again later.");
-    } finally {
-      setIsLoading(false);
+        });
+        setOrders(res?.data);
+        setFilteredOrders(res?.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setError("Failed to fetch orders. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setError("Please log in to view orders.");
     }
   };
 
   const handleOpenProductDialog = (order) => {
-    if (order?.products && order.products.length > 1) {
+    if (order?.products && order.products.length > 0) {
       setSelectedProducts(order?.products);
       setOpenProductDialog(true);
     } else {
@@ -94,26 +98,16 @@ const AdminOrders = () => {
   };
 
   const handleMarkedAsShipped = async (orderId) => {
-    try {
-      setIsLoading(true);
-      await axios.put(
-        `${SERVER_BASE_URL}orders/order/${orderId}`,
-        { status: "shipped" },
-        {
-          headers: {
-            Authorization: `Bearer ${session.token}`,
-          },
-        }
-      );
-      getOrders();
-    } catch (error) {
-      console.error("Error marking order as shipped:", error);
-      setError("Failed to mark order as shipped. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
+    console.log(`Marking order ${orderId} as shipped`);
   };
 
+  const handleMarkedAsDelivered = async (order) => {
+    if (order) {
+      setSelectedOrder(order);
+      setIsDialogOpenTracking(true);
+    }
+  };
+ 
   const handleUpdateTracking = (delivery) => {
     if (delivery) {
       console.log("Delivery info:", delivery);

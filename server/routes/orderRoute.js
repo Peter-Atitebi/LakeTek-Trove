@@ -6,9 +6,9 @@ const authenticate = require("../middlewares/authenticate");
 
 router.use(authenticate);
 
-router.get("/manager/orders", authenticate, checkIfManager, OrderController.managerGetOrders);
-router.get("/seller/orders", authenticate, OrderController.sellerGetOrders);
-router.get("/customer/orders", authenticate, OrderController.customerGetOrders);
+router.get("/manager", authenticate, checkIfManager, OrderController.managerGetOrders);
+router.get("/seller", authenticate, OrderController.sellerGetOrders);
+router.get("/customer", authenticate, OrderController.customerGetOrders);
 
 router.post("/create-order", OrderController.createOrder);
 router.get("/order/:orderId", OrderController.getOrder);
