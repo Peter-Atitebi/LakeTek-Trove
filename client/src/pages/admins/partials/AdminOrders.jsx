@@ -83,7 +83,7 @@ const AdminOrders = () => {
     if (order?.products && order.products.length > 1) {
       setSelectedProducts(order?.products);
       setOpenProductDialog(true);
-    } else { 
+    } else {
       alert("No products found for this order.");
     }
   };
@@ -236,10 +236,20 @@ const AdminOrders = () => {
             </span>
           );
         default:
-          return <span className="text-gray-500">Pending</span>;
+          return (
+            <span className="text-gray-500">
+              <span>Pending</span>
+              <PendingActionsIcon />
+            </span>
+          );
       }
     } else {
-      return <span className="text-gray-500">Pending</span>;
+      return (
+        <span className="text-gray-500">
+          <span>Pending</span>
+          <PendingActionsIcon />
+        </span>
+      );
     }
   };
 
