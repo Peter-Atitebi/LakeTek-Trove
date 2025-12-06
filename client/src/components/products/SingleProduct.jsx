@@ -8,6 +8,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Button from "@mui/material/Button";
 import ProductOptions from "./ProductOptions";
 import UpdateRecentlyViewed from "../../hooks/UpdateRecentlyViewed";
+import { useCart } from "../../hooks/CartContext";
 
 // Price formatting utility
 const formatPrice = (price, decimals = 2) => {
@@ -29,6 +30,7 @@ const SingleProduct = ({
   onDelete,
   onDuplicate,
 }) => {
+  const { addToCart } = useCart();
 
   // update recently viewed products in localStorage
   UpdateRecentlyViewed({ product });
@@ -219,7 +221,6 @@ const SingleProduct = ({
                   <span className="sr-only">More Options</span>
                 </Button>
               </div>
-
               {/* Price & Discount */}
               <div className="mb-4 sm:mb-6">
                 <div className="flex items-center gap-3 mb-2">
@@ -244,7 +245,6 @@ const SingleProduct = ({
                   )}
                 </div>
               </div>
-
               {/* Stock Info */}
               <div className="mb-4">
                 {product?.stock > 0 ? (
@@ -257,7 +257,6 @@ const SingleProduct = ({
                   </span>
                 )}
               </div>
-
               {/* Shipping Info */}
               {product?.shippingInfo && (
                 <div className="mb-4">
@@ -266,19 +265,29 @@ const SingleProduct = ({
                   </p>
                 </div>
               )}
-
               {/* Rating */}
               <ProductRating rating={rating} />
-
               {/* Add to Cart */}
-              {showAddToCart && (
-                <div className="my-6">
-                  <button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition">
-                    Add to Cart
-                  </button>
-                </div>
-              )}
 
+              {showAddToCart && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addToCart(product);
+                  }}
+                  type="button"
+                  disabled={!product?.stock || product.stock <= 0}
+                  className={`w-full sm:w-auto font-medium px-6 py-3 rounded-lg shadow-sm transition ${
+                    !product?.stock || product.stock <= 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
+                >
+                  {!product?.stock || product.stock <= 0
+                    ? "Out of Stock"
+                    : "Add to Cart"}
+                </button>
+              )}
               {/* Description */}
               <div className="mt-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">

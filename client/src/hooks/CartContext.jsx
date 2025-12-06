@@ -28,18 +28,45 @@ const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Helper function to get product ID (handles both id and _id)
+  const getProductId = (item) => {
+    return item.id || item._id;
+  };
+
   // Add item to cart
   const addToCart = (item, quantity = 1) => {
+    // Validate item
+    if (!item) {
+      console.error("Cannot add null/undefined item to cart");
+      return;
+    }
+
+    const itemId = getProductId(item);
+
+    if (!itemId) {
+      console.error("Product must have an id or _id", item);
+      return;
+    }
+
+    // Normalize the item to ensure it has both id and _id
+    const normalizedItem = {
+      ...item,
+      id: itemId,
+      _id: itemId,
+    };
+
     setCartItems((prev) => {
-      const exist = prev.find((i) => i.id === item.id);
+      const exist = prev.find((i) => getProductId(i) === itemId);
 
       if (exist) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
+          getProductId(i) === itemId
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
         );
       }
 
-      return [...prev, { ...item, quantity }];
+      return [...prev, { ...normalizedItem, quantity }];
     });
 
     setSuccessModal({
@@ -50,7 +77,7 @@ const CartProvider = ({ children }) => {
 
   // Remove single item
   const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((i) => i.id !== id));
+    setCartItems((prev) => prev.filter((i) => getProductId(i) !== id));
   };
 
   // Clear entire cart

@@ -1,5 +1,3 @@
-//src/pages/admins/partials/AdminOrders.jsx
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -29,57 +27,46 @@ const AdminOrders = () => {
   const { session } = useAuthentication();
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [filteredOrders, setFilteredOrders] = useState([]); // Stores filtered orders based on search query
-  const [selectedProducts, setSelectedProducts] = useState([]); // Stores selected products for the product details dialog
-  const [openProductDialog, setOpenProductDialog] = useState(false); // Controls the visibility of the product details dialog
-  const [error, setError] = useState(null); // stores any error message for display
-  const [isDialogOpenTracking, setIsDialogOpenTracking] = useState(false); // Controls the visibility of the tracking dialog
-  const [selectedOrder, setSelectedOrder] = useState(null); // Stores the selected order for tracking
-  const [searchQuery, setSearchQuery] = useState(""); // stores the current search query
-  const [isSearching, setIsSearching] = useState(false); // Manages search state
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [openProductDialog, setOpenProductDialog] = useState(false);
+  const [error, setError] = useState(null);
+  const [isDialogOpenTracking, setIsDialogOpenTracking] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     getOrders();
   }, []);
 
-  useEffect(() => {
-    if (searchQuery) {
-      const lowerSearchQuery = searchQuery.toLowerCase();
-      const filtered = orders.filter(
-        (order) =>
-          order.id.toLowerCase().includes(lowerSearchQuery) ||
-          order.customer?.name?.toLowerCase().includes(lowerSearchQuery) ||
-          new Date(order.createdAt)
-            .toLocaleDateString()
-            .includes(lowerSearchQuery)
-      );
-      setFilteredOrders(filtered);
-    } else {
-      setFilteredOrders(orders);
-    }
-  }, [searchQuery, orders]);
-
   const getOrders = async () => {
     if (session && session.token) {
       if (isLoading) return;
       setIsLoading(true);
+      setError(null);
       try {
         const res = await axios.get(`${SERVER_BASE_URL}/orders/manager`, {
           headers: {
             Authorization: `Bearer ${session?.token}`,
           },
         });
-        setOrders(res?.data);
-        setFilteredOrders(res?.data);
-        setIsLoading(false);
+
+        const ordersData = Array.isArray(res?.data) ? res.data : [];
+        setOrders(ordersData);
+        setFilteredOrders(ordersData);
       } catch (error) {
         console.error("Error fetching orders:", error);
         setError("Failed to fetch orders. Please try again later.");
+        setOrders([]);
+        setFilteredOrders([]);
       } finally {
         setIsLoading(false);
       }
     } else {
       setError("Please log in to view orders.");
+      setOrders([]);
+      setFilteredOrders([]);
     }
   };
 
@@ -144,20 +131,42 @@ const AdminOrders = () => {
   const handleSearchChange = async (event) => {
     const query = event.target.value;
     setSearchQuery(query);
+
+    if (!query.trim()) {
+      setFilteredOrders(orders);
+      setIsSearching(false);
+      return;
+    }
+
     if (session && session.token) {
       setIsSearching(true);
+      setError(null);
+
       try {
-        const res = await axios.get(`${SERVER_BASE_URL}/manager/orders/search`, {
-          headers: {
-            Authorization: `Bearer ${session?.token}`,
-          },
-          params: { query },
-        });
-        setIsSearching(false);
-        setFilteredOrders(res.data);
+        const res = await axios.get(
+          `${SERVER_BASE_URL}/manager/orders/search`,
+          {
+            headers: {
+              Authorization: `Bearer ${session?.token}`,
+            },
+            params: { query },
+          }
+        );
+
+        let results = [];
+        if (Array.isArray(res.data)) {
+          results = res.data;
+        } else if (res.data?.orders && Array.isArray(res.data.orders)) {
+          results = res.data.orders;
+        } else if (res.data?.data && Array.isArray(res.data.data)) {
+          results = res.data.data;
+        }
+
+        setFilteredOrders(results);
       } catch (error) {
         console.error("Error searching orders:", error);
         setError("Failed to search orders. Please try again later.");
+        setFilteredOrders(Array.isArray(filteredOrders) ? filteredOrders : []);
       } finally {
         setIsSearching(false);
       }
@@ -181,23 +190,18 @@ const AdminOrders = () => {
         <Button
           variant="contained"
           color="error"
-          onClick={() => setError(null)}
+          onClick={() => {
+            setError(null);
+            getOrders();
+          }}
         >
-          Clear
+          Retry
         </Button>
       </div>
     );
   }
 
-  if (filteredOrders.length === 0 && !isSearching) {
-    return (
-      <div className="text-center py-4 text-2xl items-center h-full">
-        <Typography variant="h6" gutterBottom color="error">
-          No orders found.
-        </Typography>
-      </div>
-    );
-  }
+  const displayOrders = Array.isArray(filteredOrders) ? filteredOrders : [];
 
   const showDeliveryStatus = (delivery) => {
     if (delivery) {
@@ -215,7 +219,6 @@ const AdminOrders = () => {
           return (
             <span className="text-yellow-500 space-x-2">
               <span>In Transit</span>
-
               <LocalShippingIcon />
             </span>
           );
@@ -264,6 +267,7 @@ const AdminOrders = () => {
           onChange={handleSearchChange}
           className="border p-2 mb-4 w-full"
         />
+        {isSearching && <Typography variant="body2">Searching...</Typography>}
       </div>
 
       <TableContainer component={Paper}>
@@ -281,56 +285,66 @@ const AdminOrders = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{truncateText(order.id, 24)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenProductDialog(order)}
-                  >
-                    View Details ({order.products.length})
-                  </Button>
-                </TableCell>
-                <TableCell>{truncateText(order.customer?.name)}</TableCell>
-                <TableCell>
-                  <span
-                    className={
-                      order.paymentStatus === "Completed"
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }
-                  >
-                    {order.paymentStatus}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  ₦
-                  {order.totalAmount.toLocaleString("en-NG", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </TableCell>
-                <TableCell>
-                  {order.createdAt
-                    ? new Date(order.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </TableCell>
-                <TableCell>{showDeliveryStatus(order.delivery)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleMarkedAsDelivered(order)}
-                    disabled={order.delivery?.status === "Delivered"}
-                    style={{ marginLeft: "10px" }}
-                  >
-                    Tracking
-                  </Button>
+            {displayOrders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  <Typography variant="body1" color="textSecondary">
+                    No orders found.
+                  </Typography>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              displayOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>{truncateText(order.id, 24)}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleOpenProductDialog(order)}
+                    >
+                      View Details ({order.products.length})
+                    </Button>
+                  </TableCell>
+                  <TableCell>{truncateText(order.customer?.name)}</TableCell>
+                  <TableCell>
+                    <span
+                      className={
+                        order.paymentStatus === "Completed"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }
+                    >
+                      {order.paymentStatus}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    ₦
+                    {order.totalAmount.toLocaleString("en-NG", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    {order.createdAt
+                      ? new Date(order.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>{showDeliveryStatus(order.delivery)}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      size="small"
+                      onClick={() => handleMarkedAsDelivered(order)}
+                      disabled={order.delivery?.status === "Delivered"}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Tracking
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

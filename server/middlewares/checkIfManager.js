@@ -2,18 +2,23 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const checkIfManager = async (req, res, next) => {
-  // get token from header
-  const token = req.header("Authorization");
-  if (!token) {
+  // Get the token from the header
+  const authHeader = req.header("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized",
+      message: "Access denied. No token provided.",
     });
   }
+
+  // Remove the "Bearer " prefix from the token string
+  const token = authHeader.split(" ")[1];
 
   try {
     // verification token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id);
 
     if (req.user.role !== "manager") {
       // return error
@@ -22,7 +27,6 @@ const checkIfManager = async (req, res, next) => {
         message: "Access denied. Not a manager",
       });
     }
-    req.user = await User.findById(decoded.id);
     // call next middleware
     next();
   } catch (error) {

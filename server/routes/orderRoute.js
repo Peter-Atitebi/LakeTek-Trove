@@ -6,13 +6,14 @@ const authenticate = require("../middlewares/authenticate");
 
 router.use(authenticate);
 
-router.get("/manager", authenticate, checkIfManager, OrderController.managerGetOrders);
-router.get("/seller", authenticate, OrderController.sellerGetOrders);
-router.get("/customer", authenticate, OrderController.customerGetOrders);
+router.get(
+  "/manager",
+  authenticate,
+  checkIfManager,
+  OrderController.managerGetOrders
+);
 
-router.post("/create-order", OrderController.createOrder);
-router.get("/order/:orderId", OrderController.getOrder);
-router.put("/order/:orderId", OrderController.updateOrder);
-router.delete("/order/:orderId", OrderController.deleteOrder);
+router.get("/customer", authenticate, OrderController.customerGetOrders);
+router.get("/seller", authenticate, OrderController.sellerGetOrders);
 
 module.exports = router;
