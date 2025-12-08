@@ -199,6 +199,33 @@ const authController = {
       });
     }
   },
+
+  updateShippingAddress: async (req, res) => {
+    const { shippingAddress } = req.body;
+    const { user } = req.user;
+
+    try {
+      const id = user.id;
+      const user = await User.findById(id);
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+      user.shippingAddress = shippingAddress;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+        shippingAddress: user.shippingAddress,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
 };
 
 module.exports = authController;

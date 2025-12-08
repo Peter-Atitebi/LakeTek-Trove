@@ -3,7 +3,7 @@
 import { useLocation, Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-const PrivateRoutes = ({ children, allowedRoles }) => {
+const PrivateRoutes = ({ children, allowedRoles, isCheckout = false }) => {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -20,6 +20,11 @@ const PrivateRoutes = ({ children, allowedRoles }) => {
   // check if user is allowed to access the route
   if (user?.id && allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  }
+
+  // Special handling for checkout route - allow access without redirect
+  if (isCheckout) {
+    return children;
   }
 
   const rolePaths = {
@@ -42,6 +47,7 @@ const PrivateRoutes = ({ children, allowedRoles }) => {
 PrivateRoutes.propTypes = {
   children: PropTypes.node.isRequired,
   allowedRoles: PropTypes.arrayOf(PropTypes.string),
+  isCheckout: PropTypes.bool,
 };
 
 export default PrivateRoutes;

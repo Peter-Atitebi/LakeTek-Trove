@@ -64,7 +64,7 @@ const AppRoutes = () => {
         <Route
           path="/checkout"
           element={
-            <PrivateRoutes>
+            <PrivateRoutes isCheckout ={true} allowedRoles={["user", "buyer"]}>
               <Checkout />
             </PrivateRoutes>
           }

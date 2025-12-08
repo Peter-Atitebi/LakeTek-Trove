@@ -1,76 +1,153 @@
 // utils/formatCurrency.js
 
-export const formatCurrency = (amount, currency = "NGN") => {
+export const formatCurrency = (amount, country = "NG") => {
   if (amount === null || amount === undefined) return "N/A";
+
+  // Map countries to their currencies
+  const countryCurrencyMap = {
+    // Africa
+    NG: "NGN", // Nigeria
+    ZA: "ZAR", // South Africa
+    EG: "EGP", // Egypt
+    KE: "KES", // Kenya
+    GH: "GHS", // Ghana
+    TZ: "TZS", // Tanzania
+    UG: "UGX", // Uganda
+    MA: "MAD", // Morocco
+    ET: "ETB", // Ethiopia
+
+    // Americas
+    US: "USD", // United States
+    CA: "CAD", // Canada
+    MX: "MXN", // Mexico
+    BR: "BRL", // Brazil
+    AR: "ARS", // Argentina
+    CL: "CLP", // Chile
+    CO: "COP", // Colombia
+    PE: "PEN", // Peru
+
+    // Europe
+    GB: "GBP", // United Kingdom
+    CH: "CHF", // Switzerland
+    SE: "SEK", // Sweden
+    NO: "NOK", // Norway
+    DK: "DKK", // Denmark
+    PL: "PLN", // Poland
+    CZ: "CZK", // Czech Republic
+    HU: "HUF", // Hungary
+    RO: "RON", // Romania
+    RU: "RUB", // Russia
+    UA: "UAH", // Ukraine
+    TR: "TRY", // Turkey
+
+    // Euro countries
+    DE: "EUR",
+    FR: "EUR",
+    IT: "EUR",
+    ES: "EUR",
+    NL: "EUR",
+    BE: "EUR",
+    AT: "EUR",
+    PT: "EUR",
+    IE: "EUR",
+    GR: "EUR",
+    FI: "EUR",
+
+    // Asia
+    CN: "CNY", // China
+    JP: "JPY", // Japan
+    KR: "KRW", // South Korea
+    IN: "INR", // India
+    PK: "PKR", // Pakistan
+    BD: "BDT", // Bangladesh
+    ID: "IDR", // Indonesia
+    MY: "MYR", // Malaysia
+    PH: "PHP", // Philippines
+    TH: "THB", // Thailand
+    VN: "VND", // Vietnam
+    SG: "SGD", // Singapore
+    HK: "HKD", // Hong Kong
+    TW: "TWD", // Taiwan
+    AE: "AED", // UAE
+    SA: "SAR", // Saudi Arabia
+    IL: "ILS", // Israel
+
+    // Oceania
+    AU: "AUD", // Australia
+    NZ: "NZD", // New Zealand
+  };
 
   const currencySymbols = {
     // Africa
-    NGN: "₦", // Nigerian Naira
-    ZAR: "R", // South African Rand
-    EGP: "E£", // Egyptian Pound
-    KES: "KSh", // Kenyan Shilling
-    GHS: "₵", // Ghanaian Cedi
-    TZS: "TSh", // Tanzanian Shilling
-    UGX: "USh", // Ugandan Shilling
-    MAD: "DH", // Moroccan Dirham
-    ETB: "Br", // Ethiopian Birr
-    XOF: "CFA", // West African CFA Franc
-    XAF: "FCFA", // Central African CFA Franc
+    NGN: "₦",
+    ZAR: "R",
+    EGP: "E£",
+    KES: "KSh",
+    GHS: "₵",
+    TZS: "TSh",
+    UGX: "USh",
+    MAD: "DH",
+    ETB: "Br",
+    XOF: "CFA",
+    XAF: "FCFA",
 
     // Americas
-    USD: "$", // US Dollar
-    CAD: "C$", // Canadian Dollar
-    MXN: "$", // Mexican Peso
-    BRL: "R$", // Brazilian Real
-    ARS: "$", // Argentine Peso
-    CLP: "$", // Chilean Peso
-    COP: "$", // Colombian Peso
-    PEN: "S/", // Peruvian Sol
+    USD: "$",
+    CAD: "C$",
+    MXN: "$",
+    BRL: "R$",
+    ARS: "$",
+    CLP: "$",
+    COP: "$",
+    PEN: "S/",
 
     // Europe
-    EUR: "€", // Euro
-    GBP: "£", // British Pound
-    CHF: "Fr", // Swiss Franc
-    SEK: "kr", // Swedish Krona
-    NOK: "kr", // Norwegian Krone
-    DKK: "kr", // Danish Krone
-    PLN: "zł", // Polish Zloty
-    CZK: "Kč", // Czech Koruna
-    HUF: "Ft", // Hungarian Forint
-    RON: "lei", // Romanian Leu
-    RUB: "₽", // Russian Ruble
-    UAH: "₴", // Ukrainian Hryvnia
-    TRY: "₺", // Turkish Lira
+    EUR: "€",
+    GBP: "£",
+    CHF: "Fr",
+    SEK: "kr",
+    NOK: "kr",
+    DKK: "kr",
+    PLN: "zł",
+    CZK: "Kč",
+    HUF: "Ft",
+    RON: "lei",
+    RUB: "₽",
+    UAH: "₴",
+    TRY: "₺",
 
     // Asia
-    CNY: "¥", // Chinese Yuan
-    JPY: "¥", // Japanese Yen
-    KRW: "₩", // South Korean Won
-    INR: "₹", // Indian Rupee
-    PKR: "₨", // Pakistani Rupee
-    BDT: "৳", // Bangladeshi Taka
-    IDR: "Rp", // Indonesian Rupiah
-    MYR: "RM", // Malaysian Ringgit
-    PHP: "₱", // Philippine Peso
-    THB: "฿", // Thai Baht
-    VND: "₫", // Vietnamese Dong
-    SGD: "S$", // Singapore Dollar
-    HKD: "HK$", // Hong Kong Dollar
-    TWD: "NT$", // Taiwan Dollar
-    AED: "د.إ", // UAE Dirham
-    SAR: "﷼", // Saudi Riyal
-    ILS: "₪", // Israeli Shekel
+    CNY: "¥",
+    JPY: "¥",
+    KRW: "₩",
+    INR: "₹",
+    PKR: "₨",
+    BDT: "৳",
+    IDR: "Rp",
+    MYR: "RM",
+    PHP: "₱",
+    THB: "฿",
+    VND: "₫",
+    SGD: "S$",
+    HKD: "HK$",
+    TWD: "NT$",
+    AED: "د.إ",
+    SAR: "﷼",
+    ILS: "₪",
 
     // Oceania
-    AUD: "A$", // Australian Dollar
-    NZD: "NZ$", // New Zealand Dollar
+    AUD: "A$",
+    NZD: "NZ$",
 
-    // Cryptocurrencies (bonus)
-    BTC: "₿", // Bitcoin
-    ETH: "Ξ", // Ethereum
+    // Cryptocurrencies
+    BTC: "₿",
+    ETH: "Ξ",
   };
 
-  return `${currencySymbols[currency] || ""}${amount.toLocaleString(undefined, {
+  const currency = countryCurrencyMap[country] || "NGN";
+  const symbol = currencySymbols[currency] || "";
+
+  return `${symbol}${amount.toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

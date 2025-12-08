@@ -11,5 +11,10 @@ router.post(
 );
 router.post("/login", authController.validateLogin, authController.login);
 router.patch("/update/:id", authController.updateUser);
+router.patch(
+  "/update-shipping-address",
+  authenticate,
+  authController.updateShippingAddress
+);
 
 module.exports = router;
