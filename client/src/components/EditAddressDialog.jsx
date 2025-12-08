@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { useAuthentication } from "../hooks/useAuthentication";
+import useAuthentication from "../hooks/useAuthentication";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../utils/api";
 
