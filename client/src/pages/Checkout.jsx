@@ -10,16 +10,24 @@ import useAuthentication from "../hooks/useAuthentication";
 import EditAddressDialog from "../components/EditAddressDialog";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Button } from "@mui/material";
+import { formatCurrency } from "../utils/formatCurrency";
+import { SERVER_BASE_URL } from "../utils/api";
+import axios from "axios";
+import DebitPayment from "../components/DebitPayment";
+import BankTransferPayment from "../components/BankTransferPayment";
+import PaystackPaymentRedirect from "../components/PaystackPaymentRedirect";
 
 const Checkout = () => {
   const { session } = useAuthentication();
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, cartTotalAmount } = useCart();
+  const { cartItems, removeFromCart } = useCart();
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [shippingAddress, setShippingAddress] = useState(null);
   const [isOpenShippingAddressModal, setIsOpenShippingAddressModal] =
     useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [userCountry, setUserCountry] = useState("NG");
 
   // check session and redirect to login if not authenticated
   useEffect(() => {
@@ -33,7 +41,22 @@ const Checkout = () => {
       setIsOpenShippingAddressModal(false);
       setShippingAddress(session?.user?.shippingAddress);
     }
-  }, [session.token, shippingAddress, navigate]);
+  }, [session.token]);
+
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+        setUserCountry(data.country_code || "NG");
+      } catch (error) {
+        console.error("Error detecting country:", error);
+        setUserCountry("NG");
+      }
+    };
+
+    detectCountry();
+  }, []);
 
   const handlePaystackPayment = () => {
     // Implement paystack payment handling logic here
@@ -45,12 +68,48 @@ const Checkout = () => {
     setSelectedPaymentMethod("debit");
   };
 
+  const handleTransferPayment = () => {
+    // Implement bank transfer payment handling logic here
+    setSelectedPaymentMethod("transfer");
+  };
+
+  const handlePaymentSuccess = (data) => {
+    try {
+      // clear the cart
+      if (cartItems.length > 0) {
+        cartItems.forEach((item) => removeFromCart(item?.id));
+      }
+    } catch (error) {
+      console.error("Error Failed to clear cart:", error);
+      setErrorMessage("Failed to clear cart after payment.");
+    }
+    // redirect to success page
+    navigate("/orders/order-confirmation" + data?.orderId);
+  };
+
+  const handleSavedAndSuccess = () => {
+    setShippingAddress(session?.user?.shippingAddress);
+    setIsOpenShippingAddressModal(false);
+  };
+
+  // Calculate cart total
+  const sum = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  const shippingFee = (sum * 0.2) / 100; // Flat shipping fee
+  const tax = (sum * 0.1) / 100; // Flat 5% tax
+
+  // Calculate final amount to pay
+  const finalAmount = sum + shippingFee + tax;
+
   return (
     <AppProvider>
       <AppLayout>
         <section className="px-2 md:px-6 lg:px-12 py-8 min-h-screen block mb-6">
           <div className="block max-w-full w-full">
-            <div className="flex items-center">
+            <div className="flex items-center mb-6">
               {/* Back Arrow */}
               <Button onClick={() => navigate(-1)} className="mr-4">
                 <ArrowBackIcon />
@@ -59,140 +118,90 @@ const Checkout = () => {
               <h2>Payment</h2>
             </div>
 
-            <div className="w-full lg:w-3/4 space-y-4 mt-6">
-              {/* Select Payment Method */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Left Side - Payment Methods */}
+              <div className="w-full lg:w-2/3 space-y-4">
+                {/* Select Payment Method */}
 
-              <div className="mb-6 flex justify-between gap-4">
-                <button
-                  onClick={handlePaystackPayment}
-                  className="flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5  
+                <div className="mb-6 flex justify-between gap-4">
+                  <button
+                    onClick={handlePaystackPayment}
+                    className="flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5  
 text-sn font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300dark:bg-blue  
 dark:hover:bg-green-700"
-                >
-                  Pay with Paystack
-                </button>
-                <button
-                  onClick={handleDebitCardPayment}
-                  className="flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5  
+                  >
+                    Pay with Paystack
+                  </button>
+                  <button
+                    onClick={handleDebitCardPayment}
+                    className="flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5  
 text-sn font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300dark:bg-blue  
 dark:hover:bg-green-700"
-                >
-                  Pay with Debit Card
-                </button>
-              </div>
-
-              {/* Debit Card Form */}
-              {selectedPaymentMethod === "debit" && (
-                <>
-                  <div className="mb-G grid grid-cols-2 gap-4">
-                    {/* Full Name */}
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="full_name"
-                        className="mb-2 block text-sm font-medium [text-gray-900 dark:text-white"
-                      >
-                        Full name (as displayed on card)*
-                      </label>
-                      <input
-                        type="text"
-                        id="full_name"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5
-text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                        placeholder="Bonnie Green"
-                        required
-                      />
-                    </div>
-                    {/* Card Number */}
-                    <div className="col-span-2 sm:col-span-1">
-                      <label
-                        htmlFor="card number input"
-                        className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Card number*
-                      </label>
-                      <input
-                        type="text"
-                        id="card-number-input"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5  
-text-sm text-gray-900 focus:border-green-500 focus:ring-green-500  
-dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                        placeholder="xxxx-xxxx-xxxx-xxxx"
-                        required
-                      />
-                    </div>
-
-                    {/* Expiration */}
-                    <div>
-                      <label
-                        htmlFor="card-expiration-input"
-                        className="mb-2 block text-se font-medium text-gray-900 dark:text-white"
-                      >
-                        Card expiration*
-                      </label>
-                      <input
-                        type="text"
-                        id="card-expiration-input"
-                        className="block w-full rounded-ig border  
-text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  
-border-gray-300 bg-gray-50 p-2.5  
-dark:border-gray-680 dark:bg-gray-700 dark:text-white"
-                        placeholder="12/23"
-                        required
-                      />
-                    </div>
-
-                    {/* CVV */}
-                    <div>
-                      <label
-                        htmlFor="cvv-input"
-                        className="mb-2 block text-sn font-medium text-gray-900 dark:text-white"
-                      >
-                        CVV*
-                      </label>
-                      <input
-                        type="number"
-                        id="cvv-input"
-                        className="block w-full rounded-1g border border-gray-300 bg-gray-50 p-2.5  
-text-sm text-gray-900 focus:border-green-500 focus:ring-green-500  
-dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                        placeholder="..."
-                        required
-                      />
-                    </div>
-                  </div>
+                  >
+                    Pay with Debit Card
+                  </button>
 
                   <button
-                    type="submit"
-                    className="mt-4 flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5
+                    onClick={handleTransferPayment}
+                    className="flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5
   text-sn font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300dark:bg-blue
   dark:hover:bg-green-700"
                   >
-                    Pay Now
-                  </button>
-                </>
-              )}
-
-              {/* Paystack Payment Redirection */}
-              {selectedPaymentMethod === "Paystack" && (
-                <div className="mt-6">
-                  <p>
-                    You will be redirected to Paystack to complete your payment.
-                  </p>
-                  <button
-                    onClick={() => {}}
-                    className="mt-4 flex w-full items-center justify-center rounded-1gbg-blue-700 px-5 py-2.5  
-text-sn font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300dark:bg-blue  
-dark:hover:bg-green-700"
-                  >
-                    Proceed to Paystack
+                    Bank Transfer
                   </button>
                 </div>
-              )}
 
-              {/* Cart Total */}
+                {/* Debit Card Form */}
+                {selectedPaymentMethod === "debit" && <DebitPayment />}
+
+                {/* Paystack Payment Redirection */}
+                {selectedPaymentMethod === "Paystack" && (
+                  <PaystackPaymentRedirect />
+                )}
+
+                {/* Bank Transfer Payment Method */}
+                {selectedPaymentMethod === "transfer" && (
+                  <BankTransferPayment />
+                )}
+              </div>
+
+              {/* Right Side - Order Summary */}
+              <div className="w-full lg:w-1/3">
+                <div className="p-4 border border-gray-300 rounded-lg sticky top-4">
+                  <h3 className="mb-4 text-lg font-semibold">Order Summary</h3>
+                  <div className="flex justify-between mb-2">
+                    <span>Subtotal:</span>
+                    <span>{formatCurrency(sum, userCountry)}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Shipping Fee:</span>
+                    <span>{formatCurrency(shippingFee, userCountry)}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Tax (%):</span>
+                    <span>{formatCurrency(tax, userCountry)}</span>
+                  </div>
+                  <hr className="my-2" />
+                  <div className="flex justify-between font-bold">
+                    <span>Total:</span>
+                    <span>{formatCurrency(finalAmount, userCountry)}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
+
+        {/* Edit Shipping Address Modal */}
+        {isOpenShippingAddressModal && (
+          <EditAddressDialog
+            open={isOpenShippingAddressModal}
+            onClose={() => setIsOpenShippingAddressModal(false)}
+            shippingAddress={shippingAddress}
+            setShippingAddress={setShippingAddress}
+            onSavedAndSuccess={handleSavedAndSuccess}
+          />
+        )}
       </AppLayout>
 
       {/* App Footer */}

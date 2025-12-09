@@ -195,7 +195,7 @@ EditAddressDialog.propTypes = {
     phone: PropTypes.string,
     zipCode: PropTypes.string,
     pinCode: PropTypes.number,
-  }).isRequired,
+  }),
   setShippingAddress: PropTypes.func,
 };
 
