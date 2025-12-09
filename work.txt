@@ -15,3 +15,10 @@ PAYSTACK_SECRET_KEY=sk_test_your_paystack_secret
 # Mongodb password: JXqEyOEXufngjXjT
 # Username: laketek-trove
 # Connection String: mongodb+srv://laketek-trove:JXqEyOEXufngjXjT@cluster0.yvdjljf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+
+
+
+
+WORK ON PAYSTACK PAYMENT INTEGRATION + ESCROW, AS WELL AS ORDER CONFIRMATIONS.
+
