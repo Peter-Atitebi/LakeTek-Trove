@@ -18,7 +18,7 @@ const shippingAddressSchema = new Schema({
   },
   state: {
     type: String,
-    required: false,
+    required: true,
   },
   postalCode: {
     type: String,
@@ -29,7 +29,7 @@ const shippingAddressSchema = new Schema({
     required: true,
   },
   phone: {
-    type: String,
+    type: Number,
     required: true,
   },
   zipCode: {

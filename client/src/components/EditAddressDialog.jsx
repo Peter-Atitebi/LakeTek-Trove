@@ -30,9 +30,9 @@ const EditAddressDialog = ({
     setError(null);
 
     axios
-      .post(
+      .patch(
         `${SERVER_BASE_URL}/auth/update-shipping-address`,
-        { shippingAddress },
+        shippingAddress,
         {
           headers: {
             Authorization: `Bearer ${session?.token}`,
@@ -54,7 +54,10 @@ const EditAddressDialog = ({
         }, 3000);
       })
       .catch((error) => {
-        setError(error.response?.data?.message || "Failed to update address.");
+        setError(
+          error.response?.data?.message ||
+            "Failed to update address." + error.message
+        );
         setProcessing(false);
       });
   };
@@ -153,6 +156,7 @@ const EditAddressDialog = ({
 
             <TextField
               label="Phone"
+              type="number"
               fullWidth
               value={shippingAddress?.phone}
               onChange={(e) =>

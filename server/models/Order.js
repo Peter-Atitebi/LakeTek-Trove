@@ -29,7 +29,13 @@ const orderSchema = new Schema({
     type: Number,
     required: true,
   },
-  status: {
+
+  paymentInfo: {
+    transactionId: String,
+    method: String,
+  },
+
+  paymentStatus: {
     type: String,
     enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
     default: "pending",

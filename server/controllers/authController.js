@@ -201,24 +201,68 @@ const authController = {
   },
 
   updateShippingAddress: async (req, res) => {
-    const { shippingAddress } = req.body;
-    const { user } = req.user;
+    const {
+      address,
+      city,
+      state,
+      country,
+      phone,
+      postalCode,
+      zipCode,
+      pinCode,
+    } = req.body;
+    const userId = req.user.id;
+
+    if (!address || !city || !state || !country || !phone || !postalCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all fields",
+      });
+    }
 
     try {
-      const id = user.id;
-      const user = await User.findById(id);
+      const user = await User.findById(userId);
       if (!user) {
         return res
           .status(404)
           .json({ success: false, message: "User not found" });
       }
-      user.shippingAddress = shippingAddress;
-      await user.save();
-      return res.status(200).json({
-        success: true,
-        message: "User updated successfully",
-        shippingAddress: user.shippingAddress,
-      });
+
+      // Check if user already has a shipping address
+      let userShippingAddress = await shippingAddress.findOne({ user: userId });
+
+      if (userShippingAddress) {
+        // Update existing shipping address
+        userShippingAddress.address = address;
+        userShippingAddress.city = city;
+        userShippingAddress.state = state;
+        userShippingAddress.country = country;
+        userShippingAddress.postalCode = postalCode;
+        userShippingAddress.zipCode = zipCode;
+        userShippingAddress.pinCode = pinCode;
+        userShippingAddress.phone = phone;
+
+        await userShippingAddress.save();
+
+        return res.status(200).json(userShippingAddress);
+      } else {
+        // Create new shipping address
+        const newShippingAddress = new shippingAddress({
+          user: userId,
+          address: address,
+          city: city,
+          state: state,
+          country: country,
+          postalCode: postalCode,
+          zipCode: zipCode,
+          pinCode: pinCode,
+          phone: phone,
+        });
+
+        await newShippingAddress.save();
+
+        return res.status(201).json(newShippingAddress);
+      }
     } catch (error) {
       return res.status(500).json({
         success: false,
