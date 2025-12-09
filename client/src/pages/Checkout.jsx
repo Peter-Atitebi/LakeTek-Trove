@@ -18,7 +18,7 @@ import BankTransferPayment from "../components/BankTransferPayment";
 import PaystackPaymentRedirect from "../components/PaystackPaymentRedirect";
 
 const Checkout = () => {
-  const { session } = useAuthentication();
+  const { session, signOut } = useAuthentication();
   const navigate = useNavigate();
   const { cartItems, removeFromCart } = useCart();
   const [successMessage, setSuccessMessage] = useState("");
@@ -30,18 +30,31 @@ const Checkout = () => {
   const [userCountry, setUserCountry] = useState("NG");
 
   // check session and redirect to login if not authenticated
+  // check session and redirect to login if not authenticated
   useEffect(() => {
     if (!session || !session.token) {
+      signOut();
       navigate("/login");
+      return;
     }
-    // check if user has shipping address
-    if (!shippingAddress) {
+
+    // Wait for session.user to be available
+    if (!session.user) {
+      return; // Don't do anything until user data loads
+    }
+
+    const userShippingAddress = session.user.shippingAddress;
+
+    // Only open modal if user doesn't have a shipping address
+    if (!userShippingAddress || !userShippingAddress.address) {
       setIsOpenShippingAddressModal(true);
+      setShippingAddress(null);
     } else {
+      // User has an address, set it and keep modal closed
+      setShippingAddress(userShippingAddress);
       setIsOpenShippingAddressModal(false);
-      setShippingAddress(session?.user?.shippingAddress);
     }
-  }, [session.token]);
+  }, [session, navigate]);
 
   useEffect(() => {
     const detectCountry = async () => {
@@ -88,7 +101,7 @@ const Checkout = () => {
   };
 
   const handleSavedAndSuccess = () => {
-    setShippingAddress(session?.user?.shippingAddress);
+    setShippingAddress(data);
     setIsOpenShippingAddressModal(false);
   };
 

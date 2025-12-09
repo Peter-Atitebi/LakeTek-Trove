@@ -12,6 +12,7 @@ import PropTypes from "prop-types";
 import useAuthentication from "../hooks/useAuthentication";
 import axios from "axios";
 import { SERVER_BASE_URL } from "../utils/api";
+import DisplayErrorMessage from "./DisplayErrorMessage";
 
 const EditAddressDialog = ({
   open,
@@ -20,7 +21,7 @@ const EditAddressDialog = ({
   shippingAddress,
   setShippingAddress,
 }) => {
-  const { session } = useAuthentication();
+  const { session, refreshSession } = useAuthentication(); // to refresh session after update
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -43,6 +44,7 @@ const EditAddressDialog = ({
         const user = JSON.parse(localStorage.getItem("user"));
         user.shippingAddress = response.data?.shippingAddress;
         localStorage.setItem("user", JSON.stringify(user));
+        refreshSession(); // refresh session to reflect updated address
         setSuccess(true);
         setProcessing(false);
 
@@ -51,7 +53,8 @@ const EditAddressDialog = ({
           onSavedAndSuccess(response.data);
           setError(null);
           setShippingAddress(response.data);
-        }, 3000);
+          onClose();
+        }, 2000);
       })
       .catch((error) => {
         setError(
@@ -61,6 +64,17 @@ const EditAddressDialog = ({
         setProcessing(false);
       });
   };
+
+  // Display error message if any
+  if (error) {
+    return (
+      <DisplayErrorMessage
+        errorMessage={error}
+        setErrorMessage={setError}
+        type="error"
+      />
+    );
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -92,7 +106,7 @@ const EditAddressDialog = ({
             <TextField
               label="Address"
               fullWidth
-              value={shippingAddress?.address}
+              value={shippingAddress?.address || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,
@@ -105,7 +119,7 @@ const EditAddressDialog = ({
             <TextField
               label="Country"
               fullWidth
-              value={shippingAddress?.country}
+              value={shippingAddress?.country || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,
@@ -118,7 +132,7 @@ const EditAddressDialog = ({
             <TextField
               label="City"
               fullWidth
-              value={shippingAddress?.city}
+              value={shippingAddress?.city || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,
@@ -131,7 +145,7 @@ const EditAddressDialog = ({
             <TextField
               label="State"
               fullWidth
-              value={shippingAddress?.state}
+              value={shippingAddress?.state || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,
@@ -144,7 +158,7 @@ const EditAddressDialog = ({
             <TextField
               label="Postal Code"
               fullWidth
-              value={shippingAddress?.postalCode}
+              value={shippingAddress?.postalCode || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,
@@ -158,7 +172,7 @@ const EditAddressDialog = ({
               label="Phone"
               type="number"
               fullWidth
-              value={shippingAddress?.phone}
+              value={shippingAddress?.phone || ""}
               onChange={(e) =>
                 setShippingAddress({
                   ...shippingAddress,

@@ -24,47 +24,48 @@ const useAuthentication = () => {
     navigate("/login");
   };
 
-  // Fix: Renamed to match the return order and made it consistent
   const signIn = (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
     setSession({ token, user });
-    // Navigate to dashboard after successful sign in
     navigate("/dashboard");
   };
 
-  // Fix: Removed problematic useEffect that was causing infinite redirects
-  // This effect was running every time session changed and redirecting to login
-  // which would clear the session and cause an infinite loop
+  // Add this new function to refresh session from localStorage
+  const refreshSession = () => {
+    try {
+      const token = localStorage.getItem("token") || null;
+      const user = JSON.parse(localStorage.getItem("user")) || null;
+      setSession({ token, user });
+    } catch (error) {
+      console.error("Failed to refresh session:", error);
+    }
+  };
 
-  // Only redirect to login if there's no session on initial load
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("user");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-  // Define routes that require authentication
-  const protectedRoutes = [
-    "/dashboard",
-    "/account",
-    "/admin",
-    "/seller",
-    "/user",
-    "/cart", // if cart requires auth
-  ];
+    const protectedRoutes = [
+      "/dashboard",
+      "/account",
+      "/admin",
+      "/seller",
+      "/user",
+      "/cart",
+    ];
 
-  const currentPath = window.location.pathname;
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    currentPath.startsWith(route)
-  );
+    const currentPath = window.location.pathname;
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      currentPath.startsWith(route)
+    );
 
-  // Only redirect if on a protected route and not authenticated
-  if (!token && !user && isProtectedRoute) {
-    navigate("/login");
-  }
-}, []);
+    if (!token && !user && isProtectedRoute) {
+      navigate("/login");
+    }
+  }, []);
 
-  // Fix: Return object instead of array for better destructuring
-  return { session, signIn, signOut };
+  return { session, signIn, signOut, refreshSession };
 };
 
 export default useAuthentication;

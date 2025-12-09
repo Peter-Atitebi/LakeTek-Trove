@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Store = require("../models/Store");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const ShippingAddress = require("../models/ShippingAddress");
 
 const authController = {
   validateRegister: [
@@ -228,8 +229,8 @@ const authController = {
           .json({ success: false, message: "User not found" });
       }
 
-      // Check if user already has a shipping address
-      let userShippingAddress = await shippingAddress.findOne({ user: userId });
+      // Use ShippingAddress (capitalized) - this was the bug!
+      let userShippingAddress = await ShippingAddress.findOne({ user: userId });
 
       if (userShippingAddress) {
         // Update existing shipping address
@@ -244,10 +245,13 @@ const authController = {
 
         await userShippingAddress.save();
 
-        return res.status(200).json(userShippingAddress);
+        return res.status(200).json({
+          success: true,
+          shippingAddress: userShippingAddress,
+        });
       } else {
-        // Create new shipping address
-        const newShippingAddress = new shippingAddress({
+        // Create new shipping address - use ShippingAddress here too!
+        const newShippingAddress = new ShippingAddress({
           user: userId,
           address: address,
           city: city,
@@ -261,12 +265,16 @@ const authController = {
 
         await newShippingAddress.save();
 
-        return res.status(201).json(newShippingAddress);
+        return res.status(201).json({
+          success: true,
+          shippingAddress: newShippingAddress,
+        });
       }
     } catch (error) {
+      console.error("Update shipping address error:", error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: "Internal server error: " + error.message,
       });
     }
   },
