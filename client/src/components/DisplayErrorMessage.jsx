@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { X } from "lucide-react";
 
 const DisplayErrorMessage = ({
   errorMessage,
@@ -94,7 +93,7 @@ const DisplayErrorMessage = ({
           className={`flex-shrink-0 ml-3 inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${iconStyles[type]} hover:bg-opacity-20 transition-colors`}
           aria-label="Dismiss"
         >
-          <X className="w-4 h-4" />
+          <div className="w-4 h-4">X</div>
         </button>
       )}
     </div>
