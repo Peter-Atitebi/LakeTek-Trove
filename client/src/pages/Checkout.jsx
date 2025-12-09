@@ -161,7 +161,9 @@ dark:hover:bg-green-700"
 
                 {/* Bank Transfer Payment Method */}
                 {selectedPaymentMethod === "transfer" && (
-                  <BankTransferPayment />
+                  <BankTransferPayment
+                    handlePaymentSuccess={handlePaymentSuccess}
+                  />
                 )}
               </div>
 
